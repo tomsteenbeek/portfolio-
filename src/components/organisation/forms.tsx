@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Trash2 } from "lucide-react";
@@ -38,7 +39,7 @@ function useAct() {
   const [pending, start] = useTransition();
   const toast = useToast();
   const router = useRouter();
-  return { pending, act: (fn: () => Promise<{ ok: boolean; message?: string; error?: string }>) => start(async () => { const r = await fn(); toast(r.ok ? "ok" : "error", (r.ok ? r.message : r.error) ?? ""); router.refresh(); }) };
+  return { pending, act: (fn: () => Promise<{ ok: boolean; message?: string; error?: string }>) => start(async () => { const r = await fn(); toast(r.ok ? "ok" : "error", (r.ok ? r.message : r.error) ?? ""); refreshData(); }) };
 }
 
 export function ArchivePositionButton({ id }: { id: string }) {

@@ -1,4 +1,3 @@
-import "server-only";
 import { ZodError } from "zod";
 import { AuthorizationError } from "@/lib/auth/current-user";
 
@@ -15,6 +14,7 @@ export function friendlyError(e: unknown): ActionResult {
     return { ok: false, error: "Controleer de gemarkeerde velden.", fieldErrors };
   }
   const pg = e as { code?: string; message?: string; constraint?: string };
+  if (pg?.code === "42501" && pg.message?.includes("teamleider")) return { ok: false, error: pg.message };
   switch (pg?.code) {
     case "42501":
       return { ok: false, error: pg.message?.includes("row-level security") ? "U heeft geen rechten voor deze wijziging." : pg.message ?? "Geen rechten." };
@@ -27,8 +27,8 @@ export function friendlyError(e: unknown): ActionResult {
     case "P0001":
       return { ok: false, error: pg.message ?? "Ongeldige bewerking." };
   }
-  console.error("[action]", e);
-  return { ok: false, error: "Er ging iets mis bij het opslaan. Probeer het opnieuw." };
+  console.error("[actie]", e);
+  return { ok: false, error: pg?.message ? `Opslaan mislukt: ${pg.message}` : "Er ging iets mis bij het opslaan. Probeer het opnieuw." };
 }
 
 function constraintMessage(c?: string) {

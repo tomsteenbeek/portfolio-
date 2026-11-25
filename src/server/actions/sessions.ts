@@ -1,4 +1,3 @@
-"use server";
 import { z } from "zod";
 import { withUser } from "@/lib/db";
 import { requireUser, requirePermission } from "@/lib/auth/current-user";

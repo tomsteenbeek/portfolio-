@@ -1,12 +1,15 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import { db, requirePermission } from "@/lib/auth/current-user";
 import { lookups } from "@/server/queries/topics";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardBody } from "@/components/ui/card";
 import { TopicForm } from "@/components/topics/topic-form";
 
-export const metadata = { title: "Nieuw onderwerp" };
+export default function NewTopic() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
 
-export default async function NewTopic({ searchParams }: { searchParams: Promise<{ pijler?: string }> }) {
   await requirePermission("topics.edit");
   const sp = await searchParams;
   const lk = await db((d) => lookups(d));
@@ -18,4 +21,6 @@ export default async function NewTopic({ searchParams }: { searchParams: Promise
       <Card><CardBody><TopicForm lookups={lk} defaultPillar={def} /></CardBody></Card>
     </>
   );
+
+  }} />;
 }

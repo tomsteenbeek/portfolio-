@@ -1,9 +1,9 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PERMISSIONS, ROLE_LABELS, type RoleCode } from "@/lib/auth/permissions";
 import { Check } from "lucide-react";
-
-export const metadata = { title: "Rollen en rechten" };
 
 const LABELS: Record<string, string> = {
   "topics.edit": "Onderwerpen aanvullen en bewerken", "topics.approve": "Inhoudelijke beoordelingen goedkeuren", "topics.delete": "Onderwerpen definitief verwijderen",
@@ -16,6 +16,8 @@ const LABELS: Record<string, string> = {
 };
 
 export default function RolesPage() {
+  return <AsyncPage render={async () => {
+
   const roles = Object.keys(ROLE_LABELS) as RoleCode[];
   return (
     <>
@@ -31,4 +33,6 @@ export default function RolesPage() {
       </CardBody></Card>
     </>
   );
+
+  }} />;
 }

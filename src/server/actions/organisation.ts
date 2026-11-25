@@ -1,4 +1,3 @@
-"use server";
 import { z } from "zod";
 import { withUser, type Db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/current-user";
@@ -130,7 +129,7 @@ export async function establishCapacity(year: number): Promise<ActionResult> {
         for (let q = 1; q <= 4; q++) await db.query(`insert into capacity_periods(year, quarter, label) values ($1,$2,$3) on conflict do nothing`, [y, q, `Q${q} ${y}`]);
         periods.splice(0, periods.length, ...(await db.query<{ id: string; quarter: number }>(`select id, quarter from capacity_periods where year = $1 order by quarter`, [y])));
       }
-      await db.query(`delete from capacity_allocations where scenario_id is null and period_id = any($1::uuid[]) and note like 'Gegenereerd:%'`, [periods.map((p) => p.id)]);
+      const periodIds = periods.map((p) => p.id);
       const staff = await db.query<{ discipline_id: string; fte: number }>(
         `select discipline_id, sum(case occupancy when 'Bezet' then fte when 'Deels bezet' then coalesce(occupied_fte,0) else 0 end) as fte
            from staffing_positions where archived_at is null group by discipline_id`);
@@ -144,11 +143,12 @@ export async function establishCapacity(year: number): Promise<ActionResult> {
            from projects j where j.archived_at is null and j.status in ('Goedgekeurd','Gepland','In uitvoering','Geblokkeerd','Gepauzeerd')
             and j.hours_required is not null and j.start_date is not null and j.end_date is not null
             and j.start_date <= make_date($1,12,31) and j.end_date >= make_date($1,1,1)`, [y]);
-      let n = 0;
+      // Regels verzamelen en in één transactie opslaan
+      const stmts: { q: string; params: unknown[] }[] = [];
       const ins = async (period: string, disc: string, kind: string, hours: number, note: string, projectId: string | null = null) => {
         if (hours <= 0) return;
-        await db.query(`insert into capacity_allocations(period_id, discipline_id, kind, hours, note, project_id) values ($1,$2,$3,$4,$5,$6)`, [period, disc, kind, Math.round(hours * 10) / 10, note, projectId]);
-        n++;
+        stmts.push({ q: `insert into capacity_allocations(period_id, discipline_id, kind, hours, note, project_id) values ($1,$2,$3,$4,$5,$6)`,
+          params: [period, disc, kind, Math.round(hours * 10) / 10, note, projectId] });
       };
       for (const p of periods) {
         for (const s of staff) {
@@ -168,7 +168,11 @@ export async function establishCapacity(year: number): Promise<ActionResult> {
           for (const dsc of pj.disciplines) await ins(p.id, dsc, "Project", h, "Gegenereerd: projecturen naar rato", pj.id);
         }
       }
-      return { ok: true, message: `Capaciteitsplanning ${y} vastgesteld (${n} regels). Ontbrekende uren-ramingen tellen niet mee.` };
+      await db.batch([
+        { q: `delete from capacity_allocations where scenario_id is null and period_id = any($1::uuid[]) and note like 'Gegenereerd:%'`, params: [periodIds] },
+        ...stmts,
+      ]);
+      return { ok: true, message: `Capaciteitsplanning ${y} vastgesteld (${stmts.length} regels). Ontbrekende uren-ramingen tellen niet mee.` };
     });
   });
 }

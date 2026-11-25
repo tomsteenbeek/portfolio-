@@ -7,15 +7,13 @@
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { Client } from "pg";
+import { dbClient } from "./connect";
 import { loadEnv } from "./env";
 
 loadEnv();
 
 async function main() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL ontbreekt (zie .env.example)");
-  const client = new Client({ connectionString: url });
+  const client = dbClient();
   await client.connect();
   await client.query(`create table if not exists schema_migrations (
     name text primary key, applied_at timestamptz not null default now())`);

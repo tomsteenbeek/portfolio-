@@ -1,4 +1,3 @@
-"use server";
 import { z } from "zod";
 import { withUser } from "@/lib/db";
 import { requirePermission, requireUser } from "@/lib/auth/current-user";
@@ -52,7 +51,7 @@ export async function saveProject(_: ActionResult | null, fd: FormData): Promise
         await db.query(`delete from project_pillars where project_id = $1`, [id]);
         for (const p of secondary) await db.query(`insert into project_pillars(project_id, pillar_id) values ($1,$2)`, [id, p]);
       }
-      return { ok: true, message: "Project opgeslagen", redirect: raw.id ? undefined : `/projecten/${id}` };
+      return { ok: true, message: "Project opgeslagen", redirect: raw.id ? undefined : `/projecten/detail?id=${id}` };
     });
   });
 }

@@ -20,7 +20,7 @@ export function MaturityGap({ rows }: { rows: { id: string; code: string; title:
       <ul className="space-y-1.5">
         {sorted.map((r) => (
           <li key={r.id} className="grid grid-cols-[minmax(140px,280px)_1fr] items-center gap-3 text-[13px]">
-            <Link href={`/onderwerpen/${r.id}?tab=volwassenheid`} className="truncate hover:text-primary hover:underline"><span className="num text-muted">{r.code}</span> {r.title}</Link>
+            <Link href={`/onderwerpen/detail?id=${r.id}&tab=volwassenheid`} className="truncate hover:text-primary hover:underline"><span className="num text-muted">{r.code}</span> {r.title}</Link>
             <div className="relative h-5" role="img" aria-label={`${r.code}: huidig ${r.current}, gewenst ${r.target}, gap ${r.target! - r.current!}`}>
               <div className="absolute inset-x-0 top-1/2 h-px bg-line" />
               <div className="absolute top-1/2 h-1 -translate-y-1/2 rounded bg-[var(--chart-1)] opacity-30" style={{ left: pos(Math.min(r.current!, r.target!)), width: `${(Math.abs(r.target! - r.current!) / 4) * 100}%` }} />

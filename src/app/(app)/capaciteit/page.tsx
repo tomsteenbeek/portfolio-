@@ -1,4 +1,7 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import Link from "next/link";
+import { GetForm } from "@/components/common/get-form";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { getSettings } from "@/server/queries/dashboard";
@@ -12,11 +15,12 @@ import { capacityFor, extraFteNeeded, loadStatus, type CapacityAssumptions } fro
 import { fmtFte, fmtHours } from "@/lib/format";
 import { PrintButton } from "@/components/common/print-button";
 
-export const metadata = { title: "Capaciteitsplanning" };
-
 const TONE: Record<string, string> = { Overbelast: "bg-bad-bg text-bad", Krap: "bg-warn-bg text-warn", "In balans": "bg-ok-bg text-ok", Onderbenut: "bg-info-bg text-info", Onbekend: "bg-surface-muted text-subtle" };
 
-export default async function CapacityPage({ searchParams }: { searchParams: Promise<{ jaar?: string; scenario?: string }> }) {
+export default function CapacityPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
+
   const sp = await searchParams;
   const d = await db(async (x, user) => {
     const s = await getSettings(x);
@@ -100,7 +104,7 @@ export default async function CapacityPage({ searchParams }: { searchParams: Pro
           {fit.length === 0 ? <p className="text-sm text-muted">Nog geen initiatieven met een urenraming.</p> : (
             <ul className="space-y-1 text-[13px]">{fit.map((x) => (
               <li key={x.id} className="flex items-center justify-between gap-2 border-b border-line py-1 last:border-0">
-                <Link href={x.kind === "project" ? `/projecten/${x.id}` : `/onderwerpen/${x.id}`} className="min-w-0 truncate hover:underline">{x.label}</Link>
+                <Link href={x.kind === "project" ? `/projecten/detail?id=${x.id}` : `/onderwerpen/detail?id=${x.id}`} className="min-w-0 truncate hover:underline">{x.label}</Link>
                 <span className="flex shrink-0 items-center gap-1.5"><PriorityBadge category={x.priority} />{x.protected && <Badge tone="accent">Verplicht</Badge>}<span className="num text-muted">{fmtHours(x.hours)}</span>
                   {!established ? <Badge>Onbekend</Badge> : x.ok ? <Badge tone="ok">Past</Badge> : <Badge tone="bad">Onvoldoende capaciteit</Badge>}</span>
               </li>))}</ul>)}
@@ -108,10 +112,10 @@ export default async function CapacityPage({ searchParams }: { searchParams: Pro
         <div className="space-y-4">
           {d.scenarios.length > 0 && (
             <Card><CardHeader title="Scenario doorrekenen" description="Rekent beschikbaarheid door zonder de vastgestelde planning te wijzigen" /><CardBody className="space-y-3">
-              <form className="flex gap-2" method="get"><input type="hidden" name="jaar" value={d.year} />
+              <GetForm path="/capaciteit" className="flex gap-2"><input type="hidden" name="jaar" value={d.year} />
                 <label htmlFor="cap-sc" className="sr-only">Scenario</label>
                 <select id="cap-sc" name="scenario" defaultValue={sp.scenario ?? ""} className="h-9 rounded-md border border-line-strong bg-surface px-2 text-sm"><option value="">Kies scenario…</option>{d.scenarios.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
-                <button className="h-9 rounded-md border border-line-strong bg-surface px-3 text-sm">Doorrekenen</button></form>
+                <button className="h-9 rounded-md border border-line-strong bg-surface px-3 text-sm">Doorrekenen</button></GetForm>
               {d.scenarioFte && (
                 <table className="w-full text-[13px]"><caption className="sr-only">Scenario-uitkomst</caption>
                   <thead className="text-left text-[12px] text-muted"><tr><th className="py-1">Discipline</th><th>Scenario beschikbaar</th><th>Gevraagd ({d.year})</th><th>Status</th></tr></thead>
@@ -135,4 +139,6 @@ export default async function CapacityPage({ searchParams }: { searchParams: Pro
       </div>
     </>
   );
+
+  }} />;
 }

@@ -1,3 +1,5 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import Link from "next/link";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
@@ -14,9 +16,10 @@ import { RubricTable } from "@/components/priority/score-input";
 import { PriorityFeasibilityMatrix } from "@/components/priority/matrix";
 import { fmtDate } from "@/lib/format";
 
-export const metadata = { title: "Prioritering" };
+export default function PriorityPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
 
-export default async function PriorityPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const { tab = "sessies" } = await searchParams;
   const d = await db(async (x, user) => ({
     user,
@@ -56,12 +59,12 @@ export default async function PriorityPage({ searchParams }: { searchParams: Pro
               <tbody>
                 {d.sessions.map((s) => (
                   <tr key={s.id} className="border-t border-line">
-                    <td className="px-4 py-2.5"><Link className="font-medium text-primary hover:underline" href={`/prioritering/${s.id}`}>{s.name}</Link>{s.is_member && <Badge tone="info" className="ml-2">Deelnemer</Badge>}</td>
+                    <td className="px-4 py-2.5"><Link className="font-medium text-primary hover:underline" href={`/prioritering/sessie?id=${s.id}`}>{s.name}</Link>{s.is_member && <Badge tone="info" className="ml-2">Deelnemer</Badge>}</td>
                     <td className="px-4"><StatusBadge status={s.status} /></td>
                     <td className="px-4 num">{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</td>
                     <td className="px-4 num">v{s.version}</td><td className="px-4 num">{s.items}</td><td className="px-4 num">{s.members}</td>
                     <td className="px-4 num">{s.assessments} / {s.items * s.members}</td>
-                    <td className="px-4 text-right"><Link className="text-[13px] text-primary hover:underline" href={`/prioritering/${s.id}`}>Openen</Link></td>
+                    <td className="px-4 text-right"><Link className="text-[13px] text-primary hover:underline" href={`/prioritering/sessie?id=${s.id}`}>Openen</Link></td>
                   </tr>
                 ))}
               </tbody>
@@ -81,4 +84,6 @@ export default async function PriorityPage({ searchParams }: { searchParams: Pro
       )}
     </>
   );
+
+  }} />;
 }

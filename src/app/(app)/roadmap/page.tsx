@@ -1,12 +1,14 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { db } from "@/lib/auth/current-user";
 import { getSettings } from "@/server/queries/dashboard";
 import { PageHeader } from "@/components/ui/page-header";
 import { Gantt, type Deadline, type GanttProject } from "@/components/roadmap/gantt";
 import { PrintButton } from "@/components/common/print-button";
 
-export const metadata = { title: "Meerjarenroadmap" };
+export default function RoadmapPage() {
+  return <AsyncPage render={async () => {
 
-export default async function RoadmapPage() {
   const d = await db(async (x) => {
     const s = await getSettings(x);
     const period = (s["roadmap.periode"] as { van: number; tot: number }) ?? { van: 2027, tot: 2030 };
@@ -20,8 +22,8 @@ export default async function RoadmapPage() {
          from projects j join pillars p on p.id = j.primary_pillar_id left join programs g on g.id = j.program_id left join users u on u.id = j.project_leader_id
         where j.archived_at is null and j.status <> 'Geannuleerd' order by p.number, j.start_date nulls last`);
     const deadlines = await x.query<Deadline>(
-      `select t.code || ' ' || t.title as label, t.legal_deadline::text as date, '/onderwerpen/' || t.id as href from topics t where t.legal_deadline is not null and t.archived_at is null
-       union all select r.name, r.deadline::text, '/wetgeving/' || r.id from regulatory_requirements r where r.deadline is not null`);
+      `select t.code || ' ' || t.title as label, t.legal_deadline::text as date, '/onderwerpen/detail?id=' || t.id as href from topics t where t.legal_deadline is not null and t.archived_at is null
+       union all select r.name, r.deadline::text, '/wetgeving/detail?id=' || r.id from regulatory_requirements r where r.deadline is not null`);
     const pillars = await x.query<{ number: number; title: string }>(`select number, title from pillars order by number`);
     const disciplines = (await x.query<{ name: string }>(`select name from disciplines order by sort_order`)).map((r) => r.name);
     return { period, projects, deadlines, pillars, disciplines };
@@ -34,4 +36,6 @@ export default async function RoadmapPage() {
       <Gantt projects={d.projects} deadlines={d.deadlines} from={d.period.van} to={d.period.tot} pillars={d.pillars} disciplines={d.disciplines} />
     </>
   );
+
+  }} />;
 }

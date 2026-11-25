@@ -1,4 +1,3 @@
-import "server-only";
 import type { Db } from "@/lib/db";
 
 export type TopicRow = {

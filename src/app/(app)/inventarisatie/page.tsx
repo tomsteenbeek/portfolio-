@@ -1,12 +1,15 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { listTopics, lookups } from "@/server/queries/topics";
 import { PageHeader } from "@/components/ui/page-header";
 import { TopicTable } from "@/components/topics/topic-table";
 
-export const metadata = { title: "Totale inventarisatie" };
+export default function InventoryPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
 
-export default async function InventoryPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const { rows, lk, views, canEdit } = await db(async (d, user) => ({
     rows: await listTopics(d, { includeArchived: true }),
@@ -30,4 +33,6 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
       />
     </>
   );
+
+  }} />;
 }

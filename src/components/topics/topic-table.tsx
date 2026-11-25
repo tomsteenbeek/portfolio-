@@ -1,10 +1,13 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { Archive, ArchiveRestore, ArrowDown, ArrowUp, Columns3, Copy, Download, Filter, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import type { TopicRow, Lookups } from "@/server/queries/topics";
 import { bulkTopics, deleteView, duplicateTopic, inlineUpdateTopic, saveView } from "@/server/actions/topics";
+import { exportTopics } from "@/server/reports";
+import type { ExportFormat } from "@/server/export";
 import { PriorityBadge, StatusBadge, Badge } from "@/components/ui/badge";
 import { Button, LinkButton, buttonClasses } from "@/components/ui/button";
 import { inputClass } from "@/components/ui/field";
@@ -140,7 +143,7 @@ export function TopicTable({ rows, lookups, canEdit, initial, views }: {
     start(async () => {
       const r = await bulkTopics([...selected], op, value);
       toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "Bijgewerkt" : r.error);
-      if (r.ok) { setSelected(new Set()); router.refresh(); }
+      if (r.ok) { setSelected(new Set()); refreshData(); }
     });
   };
 
@@ -158,12 +161,12 @@ export function TopicTable({ rows, lookups, canEdit, initial, views }: {
       {visible.map((c) => (
         <td key={c.key} className={cn("px-2.5 py-2 text-[13px]", c.width, c.key === "code" && "num text-muted whitespace-nowrap")}>
           {editing?.id === r.id && editing.key === c.key && c.edit ? (
-            <InlineEditor row={r} col={c} lookups={lookups} onDone={(changed) => { setEditing(null); if (changed) router.refresh(); }} />
+            <InlineEditor row={r} col={c} lookups={lookups} onDone={(changed) => { setEditing(null); if (changed) refreshData(); }} />
           ) : (
             <div className="group/cell flex items-start gap-1">
               <div className={cn("min-w-0 flex-1", !["title", "status", "priority_category", "flags"].includes(c.key) && "line-clamp-3")}>
                 {c.key === "title" ? (
-                  <Link href={`/onderwerpen/${r.id}`} className="font-medium text-ink hover:text-primary hover:underline">{r.title}</Link>
+                  <Link href={`/onderwerpen/detail?id=${r.id}`} className="font-medium text-ink hover:text-primary hover:underline">{r.title}</Link>
                 ) : c.render ? c.render(r) : t(r[c.key as keyof TopicRow] as string | null)}
               </div>
               {canEdit && c.edit && !r.archived_at && (
@@ -185,7 +188,7 @@ export function TopicTable({ rows, lookups, canEdit, initial, views }: {
           <button type="button" className="rounded p-1 text-subtle hover:text-primary" aria-label={`${r.archived_at ? "Herstel" : "Archiveer"} ${r.code}`} title={r.archived_at ? "Herstellen" : "Archiveren"}
             onClick={() => {
               if (!r.archived_at && !confirm(`${r.code} ${r.title} archiveren?`)) return;
-              start(async () => { const res = await bulkTopics([r.id], r.archived_at ? "restore" : "archive"); toast(res.ok ? "ok" : "error", res.ok ? (r.archived_at ? "Hersteld" : "Gearchiveerd") : res.error); router.refresh(); });
+              start(async () => { const res = await bulkTopics([r.id], r.archived_at ? "restore" : "archive"); toast(res.ok ? "ok" : "error", res.ok ? (r.archived_at ? "Hersteld" : "Gearchiveerd") : res.error); refreshData(); });
             }}>
             {r.archived_at ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
           </button>
@@ -262,11 +265,11 @@ export function TopicTable({ rows, lookups, canEdit, initial, views }: {
           <span key={v.id} className="inline-flex items-center rounded border border-line">
             <button type="button" className="px-2 py-0.5 hover:bg-surface-muted" onClick={() => applyView(v.config)}>{v.name}</button>
             <button type="button" aria-label={`Weergave ${v.name} verwijderen`} className="border-l border-line px-1 py-0.5 text-subtle hover:text-bad"
-              onClick={() => start(async () => { await deleteView(v.id); router.refresh(); })}><Trash2 className="h-3 w-3" /></button>
+              onClick={() => start(async () => { await deleteView(v.id); refreshData(); })}><Trash2 className="h-3 w-3" /></button>
           </span>
         ))}
         <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline"
-          onClick={() => { const name = prompt("Naam van deze weergave"); if (name) start(async () => { const r = await saveView("inventarisatie", name, config); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); }); }}>
+          onClick={() => { const name = prompt("Naam van deze weergave"); if (name) start(async () => { const r = await saveView("inventarisatie", name, config); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); }); }}>
           <Save className="h-3.5 w-3.5" aria-hidden />Huidige weergave opslaan
         </button>
         <span className="ml-auto text-muted num" aria-live="polite">{sorted.length} van {rows.filter((r) => !r.archived_at).length} onderwerpen</span>
@@ -382,18 +385,21 @@ function InlineEditor({ row, col, lookups, onDone }: { row: TopicRow; col: Col; 
 
 function ExportMenu({ ids, cols }: { ids: string[]; cols: string[] }) {
   const [open, setOpen] = useState(false);
+  const toast = useToast();
+  const run = async (f: ExportFormat) => {
+    setOpen(false);
+    try { await exportTopics(ids, cols, f); } catch (e) { toast("error", e instanceof Error ? e.message : "Export mislukt"); }
+  };
   return (
     <div className="relative">
       <Button size="sm" onClick={() => setOpen((o) => !o)} aria-expanded={open}><Download className="h-4 w-4" aria-hidden />Exporteren</Button>
       {open && (
-        <form method="post" action="/api/export/topics" className="absolute right-0 z-20 mt-1 w-56 rounded-md border border-line bg-surface p-1 shadow-lg" onSubmit={() => setTimeout(() => setOpen(false), 0)}>
-          <input type="hidden" name="ids" value={ids.join(",")} />
-          <input type="hidden" name="cols" value={cols.join(",")} />
+        <div className="absolute right-0 z-20 mt-1 w-56 rounded-md border border-line bg-surface p-1 shadow-lg">
           <p className="px-2 py-1 text-[12px] text-muted">{ids.length} gefilterde onderwerpen, zichtbare kolommen</p>
-          {[["xlsx", "Excel (.xlsx)"], ["csv", "CSV"], ["json", "JSON"], ["html", "Printvriendelijke HTML / PDF"]].map(([f, l]) => (
-            <button key={f} name="format" value={f} type="submit" className="block w-full rounded px-2 py-1.5 text-left text-[13px] hover:bg-surface-muted">{l}</button>
+          {([["xlsx", "Excel (.xlsx)"], ["csv", "CSV"], ["json", "JSON"], ["html", "Printvriendelijke HTML / PDF"]] as const).map(([f, l]) => (
+            <button key={f} type="button" onClick={() => run(f)} className="block w-full rounded px-2 py-1.5 text-left text-[13px] hover:bg-surface-muted">{l}</button>
           ))}
-        </form>
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,7 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import Link from "next/link";
+import { ExportButtons } from "@/components/common/export-buttons";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { dashboardCharts, dashboardKpis, getSettings, pillarCards } from "@/server/queries/dashboard";
@@ -8,10 +11,10 @@ import { Badge, Maturity, StatusBadge } from "@/components/ui/badge";
 import { PrintButton } from "@/components/common/print-button";
 import { fmtDate, fmtEuro, fmtHours, fmtPct } from "@/lib/format";
 
-export const metadata = { title: "Directieweergave" };
-
 /** Directieweergave: resultaten, risico's, investeringen en besluitvorming – minder operationeel detail. */
-export default async function BoardPage() {
+export default function BoardPage() {
+  return <AsyncPage render={async () => {
+
   const d = await db(async (x, user) => {
     const s = await getSettings(x);
     const year = Number(s["jaarplan.actief_jaar"] ?? 2027);
@@ -37,7 +40,7 @@ export default async function BoardPage() {
           {d.plan && <p className="mt-2 text-sm">{d.plan.title}: <StatusBadge status={d.plan.status} /></p>}
         </div>
         <div className="flex gap-2 no-print"><PrintButton label="Rapport afdrukken / PDF" />
-          <form method="post" action="/api/export/report"><input type="hidden" name="report" value="directie" /><button name="format" value="xlsx" className="h-9 rounded-md border border-line-strong bg-surface px-3.5 text-sm hover:bg-surface-muted">Excel</button></form></div>
+          <ExportButtons report="directie" /></div>
       </div>
       <section aria-labelledby="kern" className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <h2 id="kern" className="sr-only">Kerncijfers</h2>
@@ -52,7 +55,7 @@ export default async function BoardPage() {
           <thead className="bg-surface-muted text-left text-[12px] text-muted"><tr>{["Pijler", "Volwassenheid", "Voortgang", "Projecten", "Risico", "Laatste update"].map((h) => <th key={h} className="px-4 py-2 font-medium">{h}</th>)}</tr></thead>
           <tbody>{d.pillars.map((p) => (
             <tr key={p.id} className="border-t border-line">
-              <td className="px-4 py-3"><Link href={`/pijlers/${p.number}`} className="font-medium hover:underline">{p.number}. {p.title}</Link></td>
+              <td className="px-4 py-3"><Link href={`/pijlers/detail?nr=${p.number}`} className="font-medium hover:underline">{p.number}. {p.title}</Link></td>
               <td className="px-4"><Maturity level={p.maturity_current} /></td>
               <td className="num px-4">{fmtPct(p.progress, "Onbekend")}</td>
               <td className="num px-4">{p.active_projects} actief</td>
@@ -80,4 +83,6 @@ export default async function BoardPage() {
       <p className="mt-6 text-[12px] text-subtle">Onbekende waarden zijn nog niet vastgesteld; zij worden niet als nul weergegeven.</p>
     </div>
   );
+
+  }} />;
 }

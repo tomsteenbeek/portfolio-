@@ -1,10 +1,12 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { RegisterListPage } from "@/components/registers/register-pages";
 import { Stat } from "@/components/ui/stat";
 import { fmtHours } from "@/lib/format";
 
-export const metadata = { title: "Reguliere werkzaamheden" };
-
 export default function Page() {
+  return <AsyncPage render={async () => {
+
   return (
     <RegisterListPage registerKey="recurring" above={async (d) => {
       const s = await d.one<{ total: number | null; n: number; known: number; legal: number; critical: number; nobackup: number }>(
@@ -25,4 +27,6 @@ export default function Page() {
       );
     }} />
   );
+
+  }} />;
 }

@@ -4,11 +4,13 @@
  * vectorbestanden van Communicatie zodra beschikbaar (zelfde bestandsnamen,
  * of zet NEXT_PUBLIC_BRAND_LOGO / NEXT_PUBLIC_BRAND_MARK).
  */
+import { asset } from "@/lib/base-path";
+
 export const BRAND = {
   appName: "Digitale Informatie",
   appSubtitle: "Strategie & Portfolio",
   organisation: "Gemeente Bodegraven-Reeuwijk",
-  logoUrl: process.env.NEXT_PUBLIC_BRAND_LOGO || "/brand/logo.png",
-  markUrl: process.env.NEXT_PUBLIC_BRAND_MARK || "/brand/logo-mark.png",
-  wavesUrl: "/brand/waves.jpg",
+  logoUrl: process.env.NEXT_PUBLIC_BRAND_LOGO || asset("/brand/logo.png"),
+  markUrl: process.env.NEXT_PUBLIC_BRAND_MARK || asset("/brand/logo-mark.png"),
+  wavesUrl: asset("/brand/waves.jpg"),
 };

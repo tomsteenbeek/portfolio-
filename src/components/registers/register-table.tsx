@@ -83,7 +83,7 @@ export function RegisterTable({ def, rows, initialFilter }: { def: RegisterDef; 
                 {def.numberField && <td className="num px-3 py-2 text-muted whitespace-nowrap">{String(r[def.numberField])}</td>}
                 {cols.map((f) => (
                   <td key={f.name} className="px-3 py-2 align-top">
-                    {f.name === def.titleField ? <Link href={`${def.path}/${r.id}`} className="font-medium text-ink hover:text-primary hover:underline">{String(r[f.name])}</Link> : render(r, f)}
+                    {f.name === def.titleField ? <Link href={`${def.path}/detail?id=${r.id}`} className="font-medium text-ink hover:text-primary hover:underline">{String(r[f.name])}</Link> : render(r, f)}
                   </td>
                 ))}
                 {def.key === "risks" && <td className="px-3 py-2"><RiskScore gross={r.gross_score as number | null} residual={r.residual_score as number | null} /></td>}

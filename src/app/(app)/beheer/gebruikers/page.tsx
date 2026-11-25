@@ -1,3 +1,5 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { db, requirePermission } from "@/lib/auth/current-user";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
@@ -7,9 +9,9 @@ import { UserForm } from "@/components/admin/forms";
 import { ROLE_LABELS, type RoleCode } from "@/lib/auth/permissions";
 import { fmtDateTime } from "@/lib/format";
 
-export const metadata = { title: "Gebruikers" };
+export default function UsersPage() {
+  return <AsyncPage render={async () => {
 
-export default async function UsersPage() {
   await requirePermission("users.manage");
   const d = await db(async (x) => ({
     users: await x.query<{ id: string; email: string; display_name: string; discipline_id: string | null; discipline: string | null; job_title: string | null; is_active: boolean; is_fictitious: boolean; last_login_at: string | null; external_id: string | null; roles: string[] }>(
@@ -40,4 +42,6 @@ export default async function UsersPage() {
       </Card>
     </>
   );
+
+  }} />;
 }

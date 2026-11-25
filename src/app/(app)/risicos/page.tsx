@@ -1,11 +1,13 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { RegisterListPage } from "@/components/registers/register-pages";
 import { RiskMatrix } from "@/components/registers/risk-matrix";
 import { Card, CardBody } from "@/components/ui/card";
 import { getSettings } from "@/server/queries/dashboard";
 
-export const metadata = { title: "Risicoregister" };
-
 export default function Page() {
+  return <AsyncPage render={async () => {
+
   return (
     <RegisterListPage registerKey="risks" above={async (d) => {
       const s = await getSettings(d);
@@ -28,4 +30,6 @@ export default function Page() {
       );
     }} />
   );
+
+  }} />;
 }

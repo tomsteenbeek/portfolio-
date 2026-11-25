@@ -1,4 +1,3 @@
-import "server-only";
 import type { Db } from "@/lib/db";
 
 export type Criterion = { id: string; code: string; name: string; weight: number; description: string | null; rubric: string[] };

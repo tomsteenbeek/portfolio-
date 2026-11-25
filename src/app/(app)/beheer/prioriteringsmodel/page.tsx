@@ -1,3 +1,5 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { activeModel, modelVersions } from "@/server/queries/priority";
@@ -8,9 +10,9 @@ import { RubricTable } from "@/components/priority/score-input";
 import { Badge } from "@/components/ui/badge";
 import { fmtDateTime } from "@/lib/format";
 
-export const metadata = { title: "Prioriteringsmodel" };
+export default function ModelPage() {
+  return <AsyncPage render={async () => {
 
-export default async function ModelPage() {
   const d = await db(async (x, user) => ({ model: await activeModel(x), versions: await modelVersions(x), user }));
   const edit = can(d.user.roles, "priority.model");
   return (
@@ -25,4 +27,6 @@ export default async function ModelPage() {
       </div>
     </>
   );
+
+  }} />;
 }

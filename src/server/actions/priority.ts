@@ -1,4 +1,3 @@
-"use server";
 import { z } from "zod";
 import { withUser } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/current-user";
@@ -27,17 +26,16 @@ export async function saveModelVersion(_: ActionResult | null, fd: FormData): Pr
     const note = String(fd.get("note") ?? "").trim() || null;
     return withUser(user.id, async (db) => {
       const v = await db.one<{ v: number }>(`select coalesce(max(version),0) + 1 as v from priority_models`);
-      await db.query(`update priority_models set is_active = false where is_active`);
-      const m = await db.one<{ id: string }>(
-        `insert into priority_models(version, name, description, is_active) values ($1,$2,$3,true) returning id`,
-        [v!.v, `Model versie ${v!.v}`, note],
-      );
-      for (const [i, c] of criteria.entries()) {
-        await db.query(
-          `insert into priority_criteria(model_id, code, name, weight, description, rubric, sort_order) values ($1,$2,$3,$4,$5,$6,$7)`,
-          [m!.id, c.code, c.name, c.weight, c.description, JSON.stringify(c.rubric), i],
-        );
-      }
+      // Alles in één transactie: de controle 'som gewichten = 100%' loopt aan het eind.
+      await db.batch([
+        { q: `update priority_models set is_active = false where is_active` },
+        { q: `insert into priority_models(version, name, description, is_active) values ($1,$2,$3,true)`, params: [v!.v, `Model versie ${v!.v}`, note] },
+        ...criteria.map((c, i) => ({
+          q: `insert into priority_criteria(model_id, code, name, weight, description, rubric, sort_order)
+              select id, $2, $3, $4, $5, $6, $7 from priority_models where version = $1`,
+          params: [v!.v, c.code, c.name, c.weight, c.description, JSON.stringify(c.rubric), i],
+        })),
+      ]);
       return { ok: true, message: `Modelversie ${v!.v} is actief. Lopende sessies blijven hun eigen versie gebruiken.` };
     });
   });
@@ -68,7 +66,7 @@ export async function createSession(_: ActionResult | null, fd: FormData): Promi
       let i = 0;
       for (const t of topics) await db.query(`insert into priority_session_items(session_id, topic_id, sort_order) values ($1,$2,$3) on conflict do nothing`, [s!.id, t, i++]);
       for (const p of projects) await db.query(`insert into priority_session_items(session_id, project_id, sort_order) values ($1,$2,$3) on conflict do nothing`, [s!.id, p, i++]);
-      return { ok: true, message: "Sessie aangemaakt", redirect: `/prioritering/${s!.id}?tab=instellingen` };
+      return { ok: true, message: "Sessie aangemaakt", redirect: `/prioritering/sessie?id=${s!.id}&tab=instellingen` };
     });
   });
 }

@@ -18,7 +18,7 @@ export function PriorityFeasibilityMatrix({ points, pT, fT }: { points: Pt[]; pT
   const [hover, setHover] = useState<Pt | null>(null);
   const placed = points.filter((p) => p.priority_score !== null && p.feasibility !== null);
   const missing = points.filter((p) => p.priority_score === null || p.feasibility === null);
-  const href = (p: Pt) => (p.kind === "topic" ? `/onderwerpen/${p.id}?tab=prioriteit` : `/projecten/${p.id}`);
+  const href = (p: Pt) => (p.kind === "topic" ? `/onderwerpen/detail?id=${p.id}&tab=prioriteit` : `/projecten/detail?id=${p.id}`);
   const X = (f: number) => 8 + (f / 100) * 88;
   const Y = (p: number) => 94 - (p / 100) * 88;
   const byQ = (q: Quadrant) => placed.filter((p) => effectiveQuadrant(p.priority_score!, p.feasibility!, p.protected, pT, fT) === q);

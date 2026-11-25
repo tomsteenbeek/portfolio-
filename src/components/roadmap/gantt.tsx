@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
@@ -74,7 +75,7 @@ export function Gantt({ projects, deadlines, from, to, pillars, disciplines }: {
     setItems(items.map((i) => (i.id === d.id ? { ...i, start_date: ns, end_date: ne } : i)));
     const r = await setProjectDates(d.id, ns, ne);
     toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error);
-    if (!r.ok) setItems(prev); else router.refresh();
+    if (!r.ok) setItems(prev); else refreshData();
   };
   const keyShift = async (p: GanttProject, delta: number) => {
     if (!p.can_edit || !p.start_date || !p.end_date) return;
@@ -144,7 +145,7 @@ export function Gantt({ projects, deadlines, from, to, pillars, disciplines }: {
                   <div key={p.id} className="grid grid-cols-[280px_1fr] border-b border-line hover:bg-surface-muted/50">
                     <div className="flex items-center gap-2 truncate px-3 py-1.5 text-[13px]">
                       {p.priority_category && <PriorityBadge category={p.priority_category} />}
-                      <Link href={`/projecten/${p.id}`} className="truncate hover:text-primary hover:underline" title={p.name}><span className="num text-muted">{p.number}</span> {p.name}</Link>
+                      <Link href={`/projecten/detail?id=${p.id}`} className="truncate hover:text-primary hover:underline" title={p.name}><span className="num text-muted">{p.number}</span> {p.name}</Link>
                     </div>
                     <div className="relative h-9" ref={list[0] === p && g === groups[0][0] ? track : undefined}>
                       {years.map((y) => <div key={y} className="absolute inset-y-0 border-l border-line" style={{ left: `${pct(y * 12)}%` }} />)}
@@ -177,7 +178,7 @@ export function Gantt({ projects, deadlines, from, to, pillars, disciplines }: {
       {unplanned.length > 0 && (
         <details className="border-t border-line p-3 text-[13px]">
           <summary className="cursor-pointer text-muted">{unplanned.length} project(en) zonder volledige planning</summary>
-          <ul className="mt-2 grid gap-1 sm:grid-cols-2">{unplanned.map((p) => <li key={p.id}><Link className="text-primary hover:underline" href={`/projecten/${p.id}?tab=bewerken`}>{p.number} {p.name}</Link></li>)}</ul>
+          <ul className="mt-2 grid gap-1 sm:grid-cols-2">{unplanned.map((p) => <li key={p.id}><Link className="text-primary hover:underline" href={`/projecten/detail?id=${p.id}&tab=bewerken`}>{p.number} {p.name}</Link></li>)}</ul>
         </details>
       )}
     </div>

@@ -1,3 +1,5 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { db } from "@/lib/auth/current-user";
 import { listProjects } from "@/server/queries/projects";
 import { PageHeader } from "@/components/ui/page-header";
@@ -6,9 +8,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Card } from "@/components/ui/card";
 import { LinkButton } from "@/components/ui/button";
 
-export const metadata = { title: "Kanbanbord" };
+export default function KanbanPage() {
+  return <AsyncPage render={async () => {
 
-export default async function KanbanPage() {
   const rows = await db((x) => listProjects(x));
   return (
     <>
@@ -18,4 +20,6 @@ export default async function KanbanPage() {
       {rows.length === 0 ? <Card><EmptyState title="Nog geen projecten" description="Projecten verschijnen hier zodra ze zijn aangemaakt." /></Card> : <Kanban rows={rows} />}
     </>
   );
+
+  }} />;
 }

@@ -1,4 +1,7 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import Link from "next/link";
+import { ExportButtons } from "@/components/common/export-buttons";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { getPlan } from "@/server/queries/annual-plan";
@@ -14,9 +17,10 @@ import { ANNUAL_PLAN_SECTIONS } from "@/lib/annual-plan";
 import { fmtDateTime, fmtEuro, fmtHours } from "@/lib/format";
 import { PrintButton } from "@/components/common/print-button";
 
-export const metadata = { title: "Jaarplan" };
+export default function AnnualPlanPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
 
-export default async function AnnualPlanPage({ searchParams }: { searchParams: Promise<{ jaar?: string; bewerken?: string }> }) {
   const sp = await searchParams;
   const d = await db(async (x, user) => {
     const s = await getSettings(x);
@@ -46,7 +50,7 @@ export default async function AnnualPlanPage({ searchParams }: { searchParams: P
     <>
       <PageHeader title={plan.title} description={plan.theme ?? undefined} crumbs={[{ label: "Strategie" }, { label: "Jaarplan" }, { label: String(plan.year) }]}
         meta={<><StatusBadge status={plan.status} /><Badge>Laatst gewijzigd {fmtDateTime(plan.updated_at)}</Badge><Badge>{d.versions.length} versie(s)</Badge></>}
-        actions={<>{yearNav}<PrintButton /><form method="post" action="/api/export/report" className="no-print"><input type="hidden" name="report" value="jaarplan" /><input type="hidden" name="year" value={plan.year} /><button name="format" value="xlsx" className="h-9 rounded-md border border-line-strong bg-surface px-3.5 text-sm hover:bg-surface-muted">Excel</button></form>
+        actions={<>{yearNav}<PrintButton /><ExportButtons report="jaarplan" year={plan.year} />
           {edit && <Link href={sp.bewerken ? `/jaarplan?jaar=${plan.year}` : `/jaarplan?jaar=${plan.year}&bewerken=1`} className="inline-flex h-9 items-center rounded-md bg-primary px-3.5 text-sm text-white no-print">{sp.bewerken ? "Klaar met bewerken" : "Teksten bewerken"}</Link>}</>} />
       {edit && <Card className="mb-4 no-print"><CardBody><StatusAndVersion id={plan.id} status={plan.status} /></CardBody></Card>}
       {sp.bewerken && edit ? <Card><CardBody><SectionsForm plan={plan} /></CardBody></Card> : (
@@ -58,7 +62,7 @@ export default async function AnnualPlanPage({ searchParams }: { searchParams: P
             {section("resultaten")}
             <div className="grid gap-4 md:grid-cols-2">{d.pillars.map((p) => (
               <div key={p.id} className="rounded-md border border-line p-3">
-                <h3 className="font-semibold"><Link href={`/pijlers/${p.number}`} className="hover:underline">Pijler {p.number} · {p.title}</Link></h3>
+                <h3 className="font-semibold"><Link href={`/pijlers/detail?nr=${p.number}`} className="hover:underline">Pijler {p.number} · {p.title}</Link></h3>
                 <p className="mt-1 text-[13px] text-muted">{p.objective}</p>
                 {p.ambition_year && <p className="mt-1 text-[13px]"><strong>Ambitie {plan.year}:</strong> {p.ambition_year}</p>}
                 <ul className="mt-1.5 list-disc pl-5 text-[13px]">{p.results.map((r, i) => <li key={i}>{r}</li>)}</ul>
@@ -70,7 +74,7 @@ export default async function AnnualPlanPage({ searchParams }: { searchParams: P
                 <thead className="text-left text-[12px] text-muted"><tr><th className="py-1">Initiatief</th><th>Type</th><th>Pijler</th><th>Prioriteit</th><th>Capaciteit</th>{d.fin && <th>Budget</th>}<th /></tr></thead>
                 <tbody>{d.items.map((i) => (
                   <tr key={i.id} className="border-t border-line">
-                    <td className="py-1.5"><Link className="hover:underline" href={i.kind === "Project" ? `/projecten/${i.ref_id}` : i.kind === "Onderwerp" ? `/onderwerpen/${i.ref_id}` : `/programmas/${i.ref_id}`}>{i.label}</Link>{i.flags && <Badge tone="accent" className="ml-1">Verplicht</Badge>}{i.note && <div className="text-[12px] text-muted">{i.note}</div>}</td>
+                    <td className="py-1.5"><Link className="hover:underline" href={i.kind === "Project" ? `/projecten/detail?id=${i.ref_id}` : i.kind === "Onderwerp" ? `/onderwerpen/detail?id=${i.ref_id}` : `/programmas/detail?id=${i.ref_id}`}>{i.label}</Link>{i.flags && <Badge tone="accent" className="ml-1">Verplicht</Badge>}{i.note && <div className="text-[12px] text-muted">{i.note}</div>}</td>
                     <td>{i.kind}</td><td>{i.pillar ? `Pijler ${i.pillar}` : "—"}</td><td><PriorityBadge category={i.priority} /></td>
                     <td className="num">{fmtHours(i.hours, "Onbekend")}</td>{d.fin && <td className="num">{fmtEuro(i.budget, "Onbekend")}</td>}
                     <td className="text-right">{edit && <RemoveItem id={i.id} />}</td>
@@ -107,14 +111,16 @@ export default async function AnnualPlanPage({ searchParams }: { searchParams: P
           </CardBody></Card>
           <Card><CardHeader title="10. Benodigde besluitvorming" /><CardBody className="space-y-2">
             {section("besluitvorming")}
-            <ul className="text-sm">{d.decisions.map((x) => <li key={x.id}><Link className="hover:underline" href={`/besluiten/${x.id}`}>{x.number} {x.subject}</Link>{x.decision_body ? <span className="text-muted"> – {x.decision_body}</span> : null}</li>)}{!d.decisions.length && <li className="text-muted">Geen openstaande besluiten.</li>}</ul>
+            <ul className="text-sm">{d.decisions.map((x) => <li key={x.id}><Link className="hover:underline" href={`/besluiten/detail?id=${x.id}`}>{x.number} {x.subject}</Link>{x.decision_body ? <span className="text-muted"> – {x.decision_body}</span> : null}</li>)}{!d.decisions.length && <li className="text-muted">Geen openstaande besluiten.</li>}</ul>
           </CardBody></Card>
           <Card className="no-print"><CardHeader title="Versies" /><ul className="divide-y divide-line text-sm">
-            {d.versions.map((v) => <li key={v.id} className="flex justify-between px-5 py-2"><Link className="hover:text-primary hover:underline" href={`/jaarplan/versie/${v.id}`}>Versie {v.version} – {v.status}{v.note ? `: ${v.note}` : ""}</Link><span className="text-muted">{fmtDateTime(v.created_at)} · {v.by_name}</span></li>)}
+            {d.versions.map((v) => <li key={v.id} className="flex justify-between px-5 py-2"><Link className="hover:text-primary hover:underline" href={`/jaarplan/versie?id=${v.id}`}>Versie {v.version} – {v.status}{v.note ? `: ${v.note}` : ""}</Link><span className="text-muted">{fmtDateTime(v.created_at)} · {v.by_name}</span></li>)}
             {!d.versions.length && <li className="px-5 py-3 text-muted">Nog geen versies. Een versie wordt vastgelegd bij iedere statuswijziging of handmatig.</li>}</ul></Card>
           <p className="text-[12px] text-subtle">Secties zonder tekst worden niet automatisch gevuld. Overzichten (pijlers, initiatieven, risico&apos;s, besluiten) zijn live samengesteld; een versie legt de stand vast.{ANNUAL_PLAN_SECTIONS.length ? "" : ""}</p>
         </div>
       )}
     </>
   );
+
+  }} />;
 }

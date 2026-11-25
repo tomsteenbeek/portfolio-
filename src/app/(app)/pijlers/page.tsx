@@ -1,12 +1,14 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { getSettings, pillarCards } from "@/server/queries/dashboard";
 import { PageHeader } from "@/components/ui/page-header";
 import { PillarCard } from "@/components/pillar-card";
 
-export const metadata = { title: "Strategische pijlers" };
+export default function PillarsPage() {
+  return <AsyncPage render={async () => {
 
-export default async function PillarsPage() {
   const d = await db(async (x, user) => {
     const s = await getSettings(x);
     const fin = can(user.roles, "finance.view");
@@ -18,4 +20,6 @@ export default async function PillarsPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{d.pillars.map((p) => <PillarCard key={p.id} p={p} canFinance={d.fin} />)}</div>
     </>
   );
+
+  }} />;
 }

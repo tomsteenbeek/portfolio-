@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import { useRouter } from "next/navigation";
 import { ActionForm, SubmitButton } from "@/components/ui/action-form";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -24,7 +25,7 @@ export function SourcesPanel({ topicId, sources, canEdit }: { topicId: string; s
               <span className="text-[12px] text-muted">{fmtDate(s.created_at)}</span>
               {canEdit && (
                 <button type="button" className="ml-auto text-[12px] text-bad hover:underline"
-                  onClick={async () => { if (!confirm("Koppeling verwijderen? De oorspronkelijke input blijft bewaard.")) return; const r = await removeSource(s.id); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); }}>
+                  onClick={async () => { if (!confirm("Koppeling verwijderen? De oorspronkelijke input blijft bewaard.")) return; const r = await removeSource(s.id); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); }}>
                   Ontkoppelen
                 </button>
               )}

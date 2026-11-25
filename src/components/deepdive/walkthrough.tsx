@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -25,8 +26,8 @@ export function Walkthrough({ pillar, topics, current, canEdit, canApprove, pres
   const [newTitle, setNewTitle] = useState("");
   const idx = Math.max(0, topics.findIndex((t) => t.id === current));
   const t = topics[idx];
-  const base = present ? `/presentatie/deepdive/${pillar.number}` : `/deepdive/${pillar.number}`;
-  const go = (i: number) => router.push(`${base}?t=${topics[i].id}`);
+  const base = present ? `/presentatie/deepdive?nr=${pillar.number}` : `/deepdive/pijler?nr=${pillar.number}`;
+  const go = (i: number) => router.push(`${base}&t=${topics[i].id}`);
 
   useEffect(() => {
     if (t && canEdit) touchWorkSession("Deepdive", `Deepdive pijler ${pillar.number}`, pillar.id, { topicId: t.id, code: t.code });
@@ -55,7 +56,7 @@ export function Walkthrough({ pillar, topics, current, canEdit, canApprove, pres
                   onChange={(e) => { const s = new Set(selected); if (e.target.checked) s.add(x.id); else s.delete(x.id); setSelected(s); }} />
               )}
               <span className="mt-0.5">{icon(x)}</span>
-              <Link href={`${base}?t=${x.id}`} aria-current={i === idx ? "step" : undefined} className={cn("min-w-0 flex-1 hover:text-primary", i === idx && "font-semibold text-primary")}>
+              <Link href={`${base}&t=${x.id}`} aria-current={i === idx ? "step" : undefined} className={cn("min-w-0 flex-1 hover:text-primary", i === idx && "font-semibold text-primary")}>
                 <span className="num text-muted">{x.code}</span> {x.title}
                 {x.status === "Niet relevant" && <span className="ml-1 text-[11px] text-subtle">(niet relevant)</span>}
               </Link>
@@ -65,7 +66,7 @@ export function Walkthrough({ pillar, topics, current, canEdit, canApprove, pres
         {canEdit && (
           <form className="flex gap-2 p-3" onSubmit={(e) => {
             e.preventDefault();
-            start(async () => { const r = await quickAddTopic(pillar.id, newTitle); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); if (r.ok) { setNewTitle(""); router.push(`${base}?t=${r.id}`); router.refresh(); } });
+            start(async () => { const r = await quickAddTopic(pillar.id, newTitle); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); if (r.ok) { setNewTitle(""); router.push(`${base}&t=${r.id}`); refreshData(); } });
           }}>
             <label htmlFor="dd-new" className="sr-only">Nieuw onderwerp</label>
             <input id="dd-new" className={cn(inputClass, "h-8 text-[13px]")} placeholder="Nieuw onderwerp…" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
@@ -94,8 +95,8 @@ export function Walkthrough({ pillar, topics, current, canEdit, canApprove, pres
               <div className="flex gap-2">
                 <Button onClick={() => go(idx - 1)} disabled={idx === 0}><ChevronLeft className="h-4 w-4" aria-hidden />Vorige</Button>
                 <Button onClick={() => go(idx + 1)} disabled={idx >= topics.length - 1}>Volgende<ChevronRight className="h-4 w-4" aria-hidden /></Button>
-                {!present && <LinkButton href={`/presentatie/deepdive/${pillar.number}?t=${t.id}`} variant="ghost" aria-label="Presentatiemodus"><Maximize2 className="h-4 w-4" /></LinkButton>}
-                {!present && <LinkButton href={`/onderwerpen/${t.id}`} variant="ghost">Details</LinkButton>}
+                {!present && <LinkButton href={`/presentatie/deepdive?nr=${pillar.number}&t=${t.id}`} variant="ghost" aria-label="Presentatiemodus"><Maximize2 className="h-4 w-4" /></LinkButton>}
+                {!present && <LinkButton href={`/onderwerpen/detail?id=${t.id}`} variant="ghost">Details</LinkButton>}
               </div>
             </div>
           </div>

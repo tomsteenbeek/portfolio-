@@ -1,6 +1,8 @@
 # Databaseschema
 
-Migraties: `db/migrations/0001_core_schema.sql` (tabellen), `0002_audit_and_rls.sql` (audit, RLS), `0003_import_payload.sql`.
+Migraties: `0001_core_schema.sql` (tabellen), `0002_audit_and_rls.sql` (audit, RLS), `0003_import_payload.sql`,
+`0004_role_membership.sql` (SET-recht op `app_user`), `0005_browser_gateway.sql` (toegang vanuit de browser via
+`di_sql`/`di_batch`/`di_demo_users`, directe API-toegang afgesloten) en `0006_deferred_check_definer.sql`.
 
 ## Ontwerpprincipes
 
@@ -85,7 +87,8 @@ documentopslag), `saved_views` (opgeslagen filterweergaven), `work_sessions` (we
 
 ## Row Level Security
 
-Alle tabellen hebben RLS. De applicatie werkt als rol `app_user` met `app.user_id` per transactie. Hulpfuncties:
+Alle tabellen hebben RLS. De applicatie werkt als rol `app_user` met `app.user_id` per transactie; in de statische variant
+zet `di_sql` deze waarde op de gekozen demorol. Hulpfuncties:
 `app.uid()`, `app.has_any_role(text[])`, `app.can_edit_project(uuid)`, `app.can_see_assessment(item, user)`.
 
 | Domein | Lezen | Schrijven |

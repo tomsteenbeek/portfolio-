@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { DEEPDIVE_QUESTIONS } from "@/lib/domain";
@@ -29,7 +30,7 @@ export function DeepdiveForm({ topicId, answers, status, canEdit, canApprove, la
     const r = await saveAssessment(topicId, v, submit);
     setState(r.ok ? "saved" : "error");
     if (!r.ok) toast("error", r.error);
-    else if (submit) { toast("ok", r.message ?? ""); router.refresh(); }
+    else if (submit) { toast("ok", r.message ?? ""); refreshData(); }
   };
   const onChange = (k: string, val: string) => {
     const next = { ...values, [k]: val };
@@ -79,16 +80,16 @@ export function DeepdiveForm({ topicId, answers, status, canEdit, canApprove, la
         )}
         {canApprove && status !== "Goedgekeurd" && (
           <>
-            <Button variant="primary" onClick={() => start(async () => { const r = await approveAssessment(topicId, "approve"); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); })}>
+            <Button variant="primary" onClick={() => start(async () => { const r = await approveAssessment(topicId, "approve"); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); })}>
               Goedkeuren en valideren
             </Button>
-            <Button variant="danger" onClick={() => { if (confirm("Onderwerp als niet relevant vaststellen? Het blijft bewaard en raadpleegbaar.")) start(async () => { const r = await approveAssessment(topicId, "notRelevant"); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); }); }}>
+            <Button variant="danger" onClick={() => { if (confirm("Onderwerp als niet relevant vaststellen? Het blijft bewaard en raadpleegbaar.")) start(async () => { const r = await approveAssessment(topicId, "notRelevant"); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); }); }}>
               Niet relevant
             </Button>
           </>
         )}
         {canApprove && status === "Goedgekeurd" && (
-          <Button variant="ghost" onClick={() => start(async () => { const r = await approveAssessment(topicId, "reopen"); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); })}>Heropenen</Button>
+          <Button variant="ghost" onClick={() => start(async () => { const r = await approveAssessment(topicId, "reopen"); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); })}>Heropenen</Button>
         )}
         {locked && <p className="text-[13px] text-muted">Goedgekeurde beoordelingen kunnen alleen door de teamleider worden gewijzigd.</p>}
       </div>

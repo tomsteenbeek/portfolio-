@@ -1,3 +1,5 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import Link from "next/link";
 import { db, requirePermission } from "@/lib/auth/current-user";
 import { PageHeader } from "@/components/ui/page-header";
@@ -5,13 +7,14 @@ import { Card } from "@/components/ui/card";
 import { History } from "@/components/common/history";
 import { LinkButton } from "@/components/ui/button";
 
-export const metadata = { title: "Wijzigingshistorie" };
-
 const TABLES: Record<string, string> = { topics: "Onderwerpen", projects: "Projecten", priority_decisions: "Prioriteringsbesluiten", priority_assessments: "Beoordelingen",
   decisions: "Besluiten", risks: "Risico's", user_roles: "Autorisaties", users: "Gebruikers", settings: "Instellingen", annual_plans: "Jaarplan", priority_criteria: "Prioriteringsmodel",
   pillars: "Pijlers", staffing_positions: "Formatie", topic_assessments: "Deepdive-beoordelingen" };
 
-export default async function AuditPage({ searchParams }: { searchParams: Promise<{ tabel?: string; pagina?: string }> }) {
+export default function AuditPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
+
   await requirePermission("audit.view");
   const sp = await searchParams;
   const page = Math.max(0, Number(sp.pagina ?? 0) || 0);
@@ -34,4 +37,6 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
       </div>
     </>
   );
+
+  }} />;
 }

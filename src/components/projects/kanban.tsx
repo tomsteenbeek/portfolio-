@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -23,7 +24,7 @@ export function Kanban({ rows, hidden = ["Geannuleerd"] }: { rows: ProjectRow[];
     start(async () => {
       const r = await setProjectStatus(id, status);
       toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error);
-      if (!r.ok) setItems(prev); else router.refresh();
+      if (!r.ok) setItems(prev); else refreshData();
     });
   };
   const cols = PROJECT_STATUSES.filter((s) => !hidden.includes(s));
@@ -41,7 +42,7 @@ export function Kanban({ rows, hidden = ["Geannuleerd"] }: { rows: ProjectRow[];
                 <li key={p.id} draggable onDragStart={(e) => e.dataTransfer.setData("text/plain", p.id)}
                   className="cursor-grab rounded-md border border-line bg-surface p-2.5 text-[13px] shadow-card active:cursor-grabbing">
                   <div className="flex items-start justify-between gap-2"><span className="num text-[12px] text-muted">{p.number} · Pijler {p.pillar_number}</span><PriorityBadge category={p.priority_category} /></div>
-                  <Link href={`/projecten/${p.id}`} className="mt-0.5 block font-medium hover:text-primary hover:underline">{p.name}</Link>
+                  <Link href={`/projecten/detail?id=${p.id}`} className="mt-0.5 block font-medium hover:text-primary hover:underline">{p.name}</Link>
                   <div className="mt-1 text-[12px] text-muted">{p.leader_name ?? "Geen projectleider"}{p.progress_pct !== null ? ` · ${fmtPct(p.progress_pct)}` : ""}</div>
                   {p.blocked_by.length > 0 && <div className="mt-1 text-[12px] text-warn">Wacht op {p.blocked_by.join(", ")}</div>}
                   <label className="sr-only" htmlFor={`k-${p.id}`}>Status van {p.name}</label>

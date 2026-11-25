@@ -1,7 +1,6 @@
-import "server-only";
-import ExcelJS from "exceljs";
-
+/** Exports in de browser: Excel, CSV, JSON en printvriendelijke HTML (→ PDF via afdrukken). */
 export type Sheet = { name: string; columns: { key: string; label: string; width?: number }[]; rows: Record<string, unknown>[] };
+export type ExportFormat = "xlsx" | "csv" | "json" | "html";
 
 const cell = (v: unknown): string | number | null => {
   if (v === null || v === undefined) return null;
@@ -22,10 +21,11 @@ export function toCsv(sheet: Sheet) {
   };
   const lines = [sheet.columns.map((c) => esc(c.label)).join(";")];
   for (const r of sheet.rows) lines.push(sheet.columns.map((c) => esc(cell(r[c.key]))).join(";"));
-  return "﻿" + lines.join("\r\n"); // BOM + puntkomma voor Nederlandse Excel
+  return "﻿" + lines.join("\r\n");
 }
 
 export async function toXlsx(sheets: Sheet[]) {
+  const ExcelJS = (await import("exceljs")).default;
   const wb = new ExcelJS.Workbook();
   wb.creator = "Digitale Informatie | Strategie & Portfolio";
   wb.created = new Date();
@@ -35,9 +35,9 @@ export async function toXlsx(sheets: Sheet[]) {
     for (const r of s.rows) ws.addRow(Object.fromEntries(s.columns.map((c) => [c.key, safe(cell(r[c.key]))])));
     ws.getRow(1).font = { bold: true };
     ws.views = [{ state: "frozen", ySplit: 1 }];
-    ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: s.columns.length } };
+    if (s.columns.length) ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: s.columns.length } };
   }
-  return Buffer.from(await wb.xlsx.writeBuffer());
+  return new Blob([await wb.xlsx.writeBuffer()], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 }
 
 const escHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -50,29 +50,40 @@ export function toHtml(title: string, sheets: Sheet[], intro?: string) {
     <tbody>${s.rows.map((r) => `<tr>${s.columns.map((c) => { const v = cell(r[c.key]); return `<td>${v === null ? '<span class="u">—</span>' : escHtml(String(v))}</td>`; }).join("")}</tr>`).join("")}</tbody></table>`).join("");
   return `<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>${escHtml(title)}</title>
 <style>
-body{font-family:"Segoe UI",system-ui,Arial,sans-serif;color:#182226;margin:32px;font-size:12px}
+body{font-family:"Segoe UI",system-ui,Arial,sans-serif;color:#1a2a3a;margin:32px;font-size:12px}
 h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:24px 0 8px}
-.meta{color:#55636a;margin-bottom:16px}table{border-collapse:collapse;width:100%}
-th,td{border:1px solid #dde2e5;padding:4px 6px;text-align:left;vertical-align:top}th{background:#f1f3f4}
-.u{color:#6b787e}.bar{margin-bottom:16px}@media print{.bar{display:none}body{margin:12mm}}
+.meta{color:#506070;margin-bottom:16px}table{border-collapse:collapse;width:100%}
+th,td{border:1px solid #dbe2ea;padding:4px 6px;text-align:left;vertical-align:top}th{background:#f0f3f7}
+.u{color:#66768a}.bar{margin-bottom:16px}@media print{.bar{display:none}body{margin:12mm}}
 </style></head><body>
 <div class="bar"><button onclick="window.print()">Afdrukken / opslaan als PDF</button></div>
 <h1>${escHtml(title)}</h1><div class="meta">Gemeente Bodegraven-Reeuwijk · team Digitale Informatie · gegenereerd ${date}</div>
 ${intro ? `<p>${escHtml(intro)}</p>` : ""}${tables}</body></html>`;
 }
 
-export function download(body: string | Buffer, filename: string, type: string) {
-  return new Response(body as BodyInit, {
-    headers: { "Content-Type": type, "Content-Disposition": `attachment; filename="${filename}"`, "Cache-Control": "no-store" },
-  });
+function download(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-export async function respond(format: string, base: string, title: string, sheets: Sheet[]) {
+/** Maakt het bestand en start de download (of opent een afdrukweergave bij 'html'). */
+export async function respond(format: ExportFormat, base: string, title: string, sheets: Sheet[]) {
   const stamp = new Date().toISOString().slice(0, 10);
   switch (format) {
-    case "xlsx": return download(await toXlsx(sheets), `${base}-${stamp}.xlsx`, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    case "csv": return download(toCsv(sheets[0]), `${base}-${stamp}.csv`, "text/csv; charset=utf-8");
-    case "json": return download(JSON.stringify(Object.fromEntries(sheets.map((s) => [s.name, s.rows])), null, 2), `${base}-${stamp}.json`, "application/json");
-    default: return new Response(toHtml(title, sheets), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+    case "xlsx": return download(await toXlsx(sheets), `${base}-${stamp}.xlsx`);
+    case "csv": return download(new Blob([toCsv(sheets[0])], { type: "text/csv;charset=utf-8" }), `${base}-${stamp}.csv`);
+    case "json": return download(new Blob([JSON.stringify(Object.fromEntries(sheets.map((s) => [s.name, s.rows])), null, 2)], { type: "application/json" }), `${base}-${stamp}.json`);
+    default: {
+      const w = window.open("", "_blank");
+      if (!w) throw new Error("De afdrukweergave werd geblokkeerd door de pop-upblokkering van je browser.");
+      w.document.write(toHtml(title, sheets));
+      w.document.close();
+    }
   }
 }

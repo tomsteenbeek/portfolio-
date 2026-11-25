@@ -1,4 +1,3 @@
-"use server";
 import { z } from "zod";
 import { withUser, type Db } from "@/lib/db";
 import { requirePermission, requireUser } from "@/lib/auth/current-user";
@@ -90,7 +89,7 @@ export async function saveTopic(_: ActionResult | null, fd: FormData): Promise<A
       const sourceType = SOURCE_TYPES.includes(raw.source_type as never) ? raw.source_type : "Nog te valideren";
       await db.query(`insert into topic_sources(topic_id, source_type, note) values ($1,$2,$3)`, [row!.id, sourceType, raw.source_note ?? null]);
       await setMulti(db, row!.id, classifications, disciplines);
-      return { ok: true, message: `Onderwerp ${code} toegevoegd`, id: row!.id, redirect: raw.stay ? undefined : `/onderwerpen/${row!.id}` };
+      return { ok: true, message: `Onderwerp ${code} toegevoegd`, id: row!.id, redirect: raw.stay ? undefined : `/onderwerpen/detail?id=${row!.id}` };
     });
   });
 }
@@ -151,7 +150,7 @@ export async function duplicateTopic(id: string): Promise<ActionResult> {
       await db.query(`insert into topic_classifications select $2, classification from topic_classifications where topic_id = $1`, [id, row!.id]);
       await db.query(`insert into topic_disciplines select $2, discipline_id from topic_disciplines where topic_id = $1`, [id, row!.id]);
       await db.query(`insert into topic_sources(topic_id, source_type, note) values ($1,'Overige bron',$2)`, [row!.id, `Gedupliceerd van ${t.title}`]);
-      return { ok: true, message: `Kopie ${code} aangemaakt`, redirect: `/onderwerpen/${row!.id}` };
+      return { ok: true, message: `Kopie ${code} aangemaakt`, redirect: `/onderwerpen/detail?id=${row!.id}` };
     });
   });
 }
@@ -387,7 +386,7 @@ export async function bundleToProgram(_: ActionResult | null, fd: FormData): Pro
         pid = row!.id;
       }
       await db.query(`update topics set program_id = $2 where id = any($1::uuid[])`, [ids, uuid.parse(pid)]);
-      return { ok: true, message: `${ids.length} onderwerp(en) gebundeld in programma`, redirect: `/programmas/${pid}` };
+      return { ok: true, message: `${ids.length} onderwerp(en) gebundeld in programma`, redirect: `/programmas/detail?id=${pid}` };
     });
   });
 }
@@ -414,7 +413,7 @@ export async function convertToProject(_: ActionResult | null, fd: FormData): Pr
         [p!.id, ids, first!.pillar_id],
       );
       await db.query(`update topics set status = 'Omgezet naar project' where id = any($1::uuid[])`, [ids]);
-      return { ok: true, message: `Project ${p!.number} aangemaakt`, redirect: `/projecten/${p!.id}` };
+      return { ok: true, message: `Project ${p!.number} aangemaakt`, redirect: `/projecten/detail?id=${p!.id}` };
     });
   });
 }

@@ -1,12 +1,15 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import { db, requirePermission } from "@/lib/auth/current-user";
 import { PageHeader } from "@/components/ui/page-header";
 import { BundleForms } from "@/components/deepdive/bundle-forms";
 import { EmptyState } from "@/components/ui/empty-state";
 import { z } from "zod";
 
-export const metadata = { title: "Bundelen" };
+export default function BundlePage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
 
-export default async function BundlePage({ searchParams }: { searchParams: Promise<{ ids?: string; terug?: string }> }) {
   await requirePermission("topics.edit");
   const sp = await searchParams;
   const ids = (sp.ids ?? "").split(",").filter((x) => z.string().uuid().safeParse(x).success);
@@ -17,7 +20,7 @@ export default async function BundlePage({ searchParams }: { searchParams: Promi
   return (
     <>
       <PageHeader title="Onderwerpen bundelen, samenvoegen of omzetten"
-        crumbs={[{ label: "Portfolio" }, { label: "Deepdive", href: sp.terug ? `/deepdive/${sp.terug}` : "/deepdive" }, { label: "Bundelen" }]}
+        crumbs={[{ label: "Portfolio" }, { label: "Deepdive", href: sp.terug ? `/deepdive/pijler?nr=${sp.terug}` : "/deepdive" }, { label: "Bundelen" }]}
         description={`${d.topics.length} onderwerp(en) geselecteerd. Voorkom dat ieder onderwerp automatisch een afzonderlijk project wordt.`} />
       {d.topics.length === 0 ? <EmptyState title="Geen onderwerpen geselecteerd" description="Selecteer onderwerpen in de inventarisatie of deepdive." /> : (
         <>
@@ -27,4 +30,6 @@ export default async function BundlePage({ searchParams }: { searchParams: Promi
       )}
     </>
   );
+
+  }} />;
 }

@@ -13,18 +13,25 @@ Lees eerst: PROJECT_CONTEXT.md, ARCHITECTURE.md, DATABASE_SCHEMA.md, SECURITY.md
 - Geen decoratieve knoppen: elke knop moet werken.
 
 ## Technische regels
-- Data lezen/schrijven **alleen** via `db()` / `withUser()` (RLS actief). `asSystem()` uitsluitend voor authenticatie.
-- Schrijven via server actions met Zod-validatie, `requirePermission()` en `run()` voor foutvertaling.
+- Variant op `main`: **statische site (GitHub Pages) + Supabase, zonder login**. Geen servercode, API-routes, middleware
+  of `"use server"`; alles draait in de browser. Serverversie: branch `server-versie`.
+- Data lezen/schrijven **alleen** via `db()` / `withUser()` uit `@/lib/auth/current-user` en `@/lib/db` (→ `public.di_sql`,
+  uitgevoerd als `app_user`, RLS actief). Meerdere opdrachten die samen moeten slagen: `d.batch()`.
+- Schermen: `"use client"` + `<AsyncPage render={async (sp) => …} />`; detailpagina's via zoekparameters
+  (`/onderwerpen/detail/?id=…`, `/pijlers/detail/?nr=…`). Na een wijziging `refreshData()`.
+- Interne links via `next/link` of `router.push` (houden rekening met het basispad); afbeeldingen via `asset()`.
+- Schrijfacties: Zod-validatie, `requirePermission()` (demorol) en `run()` voor foutvertaling.
 - Kolom- en tabelnamen in dynamische SQL alleen uit configuratie (`src/lib/registers.ts`), nooit uit invoer.
-- Schemawijziging = nieuwe genummerde migratie in `db/migrations` (bestaande migraties niet aanpassen) + RLS-policy + eventueel audittrigger.
+- Schemawijziging = nieuwe genummerde migratie in `db/migrations` (bestaande niet aanpassen) + RLS-policy + audittrigger.
+  De publicatieworkflow voert migraties automatisch uit op Supabase.
 - Domeinwaarden synchroon houden tussen `src/lib/domain.ts` en database-`CHECK`s.
 - Rekenlogica als pure functie in `src/lib` met unit-tests.
-- Gebruik design tokens (Tailwind-klassen `bg-primary`, `text-muted`, …), geen losse hexkleuren in componenten.
-- Toegankelijkheid: labels bij velden, focus zichtbaar, toetsenbordalternatief voor drag-and-drop, tabel bij grafieken.
-- Geen secrets in code of `NEXT_PUBLIC_*`. Geen externe scripts/fonts (CSP).
+- Design tokens gebruiken (Tailwind-klassen), geen losse hexkleuren in componenten.
+- Toegankelijkheid: labels bij velden, zichtbare focus, toetsenbordalternatief voor drag-and-drop, tabel bij grafieken.
+- Nooit het databasewachtwoord of een Supabase service-role key in de code of in `NEXT_PUBLIC_*`.
 
 ## Commando's
-`npm run dev` · `npm run db:setup` · `npm test` · `npm run typecheck` · `npm run lint`
+`npm run dev` · `npm run dev:gateway` · `npm run db:setup` · `npm test` · `npm run typecheck` · `npm run lint` · `npm run build`
 
 ## Veiligheid
 Geen productie-implementatie, externe gegevensoverdracht of destructieve databasewijziging zonder expliciete toestemming.

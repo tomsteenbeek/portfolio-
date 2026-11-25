@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -88,7 +89,7 @@ function AssessItem({ item, criteria, existing, open, large, onSaved }: { item: 
         <Button variant="primary" disabled={pending} onClick={() => start(async () => {
           const r = await submitAssessment(item.id, scores, rationale);
           toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error);
-          if (r.ok) { router.refresh(); onSaved?.(); }
+          if (r.ok) { refreshData(); onSaved?.(); }
         })}>{existing ? `Beoordeling bijwerken (revisie ${existing.revision + 1})` : "Beoordeling opslaan"}</Button>
       )}
     </div>
@@ -137,7 +138,7 @@ function ConsensusItem({ item, criteria, existing, median, canConsensus, canFina
           <label htmlFor={`cn-${item.id}`} className="text-[13px] font-medium">Toelichting consensus</label>
           <textarea id={`cn-${item.id}`} className={inputClass} rows={2} value={note} onChange={(e) => setNote(e.target.value)} disabled={!canConsensus} />
           {canConsensus && <Button variant="secondary" disabled={pending} onClick={() => start(async () => {
-            const r = await saveConsensus(item.id, scores, note); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh();
+            const r = await saveConsensus(item.id, scores, note); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData();
           })}>Consensus vastleggen</Button>}
         </div>
         <div className="space-y-3">
@@ -155,7 +156,7 @@ function ConsensusItem({ item, criteria, existing, median, canConsensus, canFina
                 <p className="rounded bg-accent-soft px-2 py-1.5 text-[12px] text-accent">Let op: dit initiatief is gemarkeerd als {item.flags.join(", ").toLowerCase()}. Een lage prioriteit mag het niet uitsluiten; leg vast hoe aan de verplichting wordt voldaan.</p>
               )}
               <Button variant="primary" disabled={pending || !final} onClick={() => start(async () => {
-                const r = await finalizePriority(item.id, final as Category, why); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); if (r.ok) { setWhy(""); router.refresh(); }
+                const r = await finalizePriority(item.id, final as Category, why); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); if (r.ok) { setWhy(""); refreshData(); }
               })}>Definitief vaststellen</Button>
             </>
           ) : <p className="text-[13px] text-muted">Alleen de teamleider stelt de definitieve prioriteit vast.</p>}
@@ -176,17 +177,17 @@ export function StatusControl({ id, status }: { id: string; status: string }) {
     <div className="flex flex-wrap items-center gap-2">
       {n && <Button variant="primary" disabled={pending} onClick={() => {
         if (!confirm(`${label[n]}?`)) return;
-        start(async () => { const r = await setSessionStatus(id, n as (typeof SESSION_STATUSES)[number]); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); });
+        start(async () => { const r = await setSessionStatus(id, n as (typeof SESSION_STATUSES)[number]); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); });
       }}>{label[n]}</Button>}
       {status !== "Concept" && status !== "Open voor beoordeling" && (
-        <Button variant="ghost" disabled={pending} onClick={() => start(async () => { const r = await setSessionStatus(id, "Open voor beoordeling"); toast(r.ok ? "ok" : "error", r.ok ? "Sessie heropend" : r.error); router.refresh(); })}>Heropenen</Button>
+        <Button variant="ghost" disabled={pending} onClick={() => start(async () => { const r = await setSessionStatus(id, "Open voor beoordeling"); toast(r.ok ? "ok" : "error", r.ok ? "Sessie heropend" : r.error); refreshData(); })}>Heropenen</Button>
       )}
     </div>
   );
 }
 
 export function PresentLink({ id, tab }: { id: string; tab: string }) {
-  return <LinkButton href={`/prioritering/${id}/presentatie?tab=${tab}`} variant="secondary"><Maximize2 className="h-4 w-4" aria-hidden />Presentatiemodus</LinkButton>;
+  return <LinkButton href={`/presentatie/prioritering?id=${id}&tab=${tab}`} variant="secondary"><Maximize2 className="h-4 w-4" aria-hidden />Presentatiemodus</LinkButton>;
 }
 
 export function BackLink({ href }: { href: string }) {

@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
@@ -32,7 +33,7 @@ export function StatusAndVersion({ id, status }: { id: string; status: string })
   const [pending, start] = useTransition();
   const toast = useToast();
   const router = useRouter();
-  const done = (r: { ok: boolean; message?: string; error?: string }) => { toast(r.ok ? "ok" : "error", (r.ok ? r.message : r.error) ?? ""); if (r.ok) { setNote(""); router.refresh(); } };
+  const done = (r: { ok: boolean; message?: string; error?: string }) => { toast(r.ok ? "ok" : "error", (r.ok ? r.message : r.error) ?? ""); if (r.ok) { setNote(""); refreshData(); } };
   return (
     <div className="flex flex-wrap items-end gap-2">
       <label className="flex flex-col text-[12px] text-muted">Status
@@ -65,7 +66,7 @@ export function RemoveItem({ id }: { id: string }) {
   const toast = useToast();
   const router = useRouter();
   return <button type="button" disabled={pending} aria-label="Verwijderen uit jaarplan" className="text-subtle hover:text-bad no-print"
-    onClick={() => confirm("Verwijderen uit jaarplan?") && start(async () => { const r = await removePlanItem(id); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); router.refresh(); })}><Trash2 className="h-4 w-4" /></button>;
+    onClick={() => confirm("Verwijderen uit jaarplan?") && start(async () => { const r = await removePlanItem(id); toast(r.ok ? "ok" : "error", r.ok ? r.message ?? "" : r.error); refreshData(); })}><Trash2 className="h-4 w-4" /></button>;
 }
 
 export function NewPlanForm({ defaultYear }: { defaultYear: number }) {

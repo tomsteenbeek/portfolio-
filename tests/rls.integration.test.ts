@@ -129,4 +129,50 @@ d("autorisatie in de database", () => {
       await expect(q(`update source_inputs set raw = '{"reactie":"gewijzigd"}' where id = $1`, [r])).rejects.toThrow(/niet worden gewijzigd/);
     });
   });
+
+  describe("toegang vanuit de browser (rol anon, migratie 0005)", () => {
+    async function asAnon<T>(fn: () => Promise<T>): Promise<T> {
+      await c.query("begin");
+      try {
+        await c.query("set local role anon");
+        return await fn();
+      } finally {
+        await c.query("rollback");
+      }
+    }
+    const hasAnon = async () => (await q("select 1 from pg_roles where rolname = 'anon'")).rowCount === 1;
+
+    it("anon kan tabellen niet rechtstreeks lezen", async () => {
+      if (!(await hasAnon())) return;
+      await asAnon(async () => { await expect(q("select count(*) from topics")).rejects.toThrow(/permission denied/); });
+    });
+
+    it("di_sql past de rechtenregels van de gekozen gebruiker toe", async () => {
+      if (!(await hasAnon())) return;
+      await asAnon(async () => {
+        const r = await q("select public.di_sql('select count(*)::int n from topics', '[]', $1) as r", [ids.dir]);
+        expect(r.rows[0].r[0].n).toBeGreaterThanOrEqual(122);
+        const none = await q("select public.di_sql('select count(*)::int n from topics', '[]', null) as r");
+        expect(none.rows[0].r[0].n).toBe(0);
+        await fails("select public.di_sql($1, '[]', $2)", ["update topics set priority_category = 'P1' where code = '1.01'", ids.mw], /teamleider/);
+      });
+    });
+
+    it("di_sql kan geen DDL uitvoeren of van rol wisselen", async () => {
+      if (!(await hasAnon())) return;
+      await asAnon(async () => {
+        await fails("select public.di_sql($1, '[]', $2)", ["select set_config('role', 'postgres', true)", ids.adm], /security-definer/);
+        await fails("select public.di_sql($1, '[]', $2)", ["create table x(i int)", ids.adm], /syntax error|permission denied/);
+      });
+    });
+
+    it("parameters worden veilig ingevuld (geen SQL-injectie)", async () => {
+      if (!(await hasAnon())) return;
+      await asAnon(async () => {
+        const v = "x'); drop table topics; --";
+        const r = await q("select public.di_sql('select $1::text as v', $1::jsonb, $2) as r", [JSON.stringify([v]), ids.tl]);
+        expect(r.rows[0].r[0].v).toBe(v);
+      });
+    });
+  });
 });

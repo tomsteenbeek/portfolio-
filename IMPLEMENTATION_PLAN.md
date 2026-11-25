@@ -1,5 +1,10 @@
 # Implementatieplan
 
+## Varianten
+
+- **`main`**: statische site op GitHub Pages + Supabase, demo zonder login (wens opdrachtgever, november 2026).
+- **`server-versie`**: Next.js-server met Entra ID-voorbereiding en Docker; basis voor gemeentelijke productie.
+
 ## Fasering en status
 
 ### Fase 1 – Fundament ✅

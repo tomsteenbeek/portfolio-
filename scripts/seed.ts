@@ -5,7 +5,7 @@
  *   npm run db:seed            # basisinhoud + fictieve ontwikkelgebruikers
  *   SEED_DEV_USERS=false npm run db:seed   # zonder fictieve gebruikers (test/productie)
  */
-import { Client } from "pg";
+import { dbClient } from "./connect";
 import { loadEnv } from "./env";
 import {
   DEFAULT_SETTINGS,
@@ -26,7 +26,7 @@ export function topicCode(pillar: number, index: number) {
 }
 
 async function main() {
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  const client = dbClient();
   await client.connect();
   await client.query("begin");
   try {

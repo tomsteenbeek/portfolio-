@@ -1,12 +1,14 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import { db, requirePermission } from "@/lib/auth/current-user";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardBody } from "@/components/ui/card";
 import { SettingForm } from "@/components/admin/forms";
 import { BRAND } from "@/config/brand";
 
-export const metadata = { title: "Instellingen" };
+export default function SettingsPage() {
+  return <AsyncPage render={async () => {
 
-export default async function SettingsPage() {
   await requirePermission("settings.edit");
   const rows = await db((x) => x.query<{ key: string; value: unknown; description: string | null }>(`select key, value, description from settings where key <> 'capaciteit.aannames' order by key`));
   return (
@@ -22,4 +24,6 @@ export default async function SettingsPage() {
       </div>
     </>
   );
+
+  }} />;
 }

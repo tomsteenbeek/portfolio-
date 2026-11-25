@@ -1,110 +1,114 @@
 # Digitale Informatie | Strategie & Portfolio
 
-Databasegestuurde managementapplicatie voor team Digitale Informatie van de gemeente Bodegraven-Reeuwijk:
-strategische planning, jaarplan, gezamenlijke prioritering, portfolio-, project- en capaciteitsmanagement.
+Dashboard voor strategie, jaarplan, gezamenlijke prioritering, portfolio-, project- en capaciteitsmanagement van team
+Digitale Informatie (gemeente Bodegraven-Reeuwijk).
 
 > Centraal thema 2027: **Van reactief beheer naar proactieve regie – een betrouwbare digitale basis voor een toekomstbestendige gemeente.**
 
-## Status
+## Opzet: GitHub Pages + Supabase (demo zonder login)
 
-| Fase | Inhoud | Status |
+| Onderdeel | Rol |
+|---|---|
+| **GitHub** | Code; bij elke wijziging op `main` publiceert GitHub Actions de site automatisch |
+| **GitHub Pages** | Toont het dashboard (statische pagina's) op `https://<gebruikersnaam>.github.io/<repository>/` |
+| **Supabase** | PostgreSQL-database; de browser leest en schrijft via twee beveiligde databasefuncties |
+
+Er is **geen login**: je werkt standaard als *Robin Teamleider (fictief)* en kunt rechtsboven van demorol wisselen om
+het dashboard per rol te bekijken.
+
+> ⚠️ **Alleen voor demo en eigen gebruik met fictieve of niet-gevoelige gegevens.** Zonder login kan iedereen met de
+> link gegevens bekijken en wijzigen. Zie [SECURITY.md](SECURITY.md). De volledige serverversie (met Entra ID-voorbereiding,
+> geschikt voor gemeentelijke hosting) staat op de branch **`server-versie`**.
+
+## Eenmalig instellen (± 15 minuten)
+
+### 1. Supabase-project
+1. Ga naar https://supabase.com, log in en kies **New project**.
+2. Naam bijvoorbeeld `portfolio`, regio **Central EU (Frankfurt)**, kies een databasewachtwoord en **bewaar dat**.
+3. Noteer, als het project klaar is:
+   - **Project URL** en **publishable key** (of *anon key*): *Project Settings → API Keys* (de URL ook via *Connect*).
+   - **Connection string**: knop **Connect** → **Session pooler** → kopieer de URI en vervang `[YOUR-PASSWORD]` door je wachtwoord.
+
+### 2. GitHub Pages aanzetten
+1. GitHub Pages voor een **privé**-repository vraagt een betaald account (GitHub Pro). Met een gratis account maak je de
+   repository **openbaar**: *Settings → General → Danger Zone → Change visibility*. De code bevat geen wachtwoorden.
+2. *Settings → Pages → Build and deployment → Source*: kies **GitHub Actions**.
+
+### 3. Gegevens van Supabase aan GitHub geven
+*Settings → Secrets and variables → Actions*:
+
+| Tabblad | Naam | Waarde |
 |---|---|---|
-| 1 Fundament | Architectuur, design tokens, database + RLS + audit, authenticatie, navigatie, componenten, seed | Gereed |
-| 2 Strategische inventarisatie | Dashboard, 7 pijlers, alle onderwerpen, detailpagina's, bewerken/toevoegen, import, volwassenheidsmodel, deepdive | Gereed |
-| 3 Gezamenlijke prioritering | Model (versiebeheer), sessies, blind stemmen, resultaten, consensus, vaststelling, haalbaarheidsmatrix, besluitenregister | Gereed |
-| 4 Portfolio & jaarplan | Programma's, projecten (tabbladen), kanban, afhankelijkheden, jaarplan met versies, Gantt-roadmap | Werkend, basis |
-| 5 Formatie & capaciteit | Posities, scenario's, organogram, reguliere werkzaamheden, capaciteitsmodel en heatmap | Werkend, basis |
-| 6 Professionalisering | Risico's (5×5), KPI's met metingen, leveranciers, wetgeving, exports, directieweergave | Werkend, basis |
+| **Variables** | `SUPABASE_URL` | Project URL, bv. `https://abcd1234.supabase.co` |
+| **Variables** | `SUPABASE_ANON_KEY` | publishable key (`sb_publishable_…`) of anon key |
+| **Secrets** | `SUPABASE_DB_URL` | de Session pooler connection string mét wachtwoord |
 
-Zie [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) voor vervolgstappen.
+### 4. Publiceren
+*Actions → Publiceren op GitHub Pages → Run workflow*. Na enkele minuten staat het dashboard op
+`https://<gebruikersnaam>.github.io/<repository>/` (de link staat ook bij de afgeronde workflow).
 
-## Lokaal gebruiken (aanbevolen voor de teamleider)
+De eerste keer richt de workflow de database in: tabellen, rechtenregels, de 7 pijlers, 122 onderwerpen en de fictieve
+demogebruikers. Bij volgende publicaties wordt de database alleen bijgewerkt; jouw gegevens blijven behouden.
 
-Dashboard + database op je eigen computer met Docker Desktop: dubbelklik op **`start.bat`** en open http://localhost:3000.
-Zie **[LOKAAL-GEBRUIK.md](LOKAAL-GEBRUIK.md)** voor installatie, back-up en herstel.
+## Dagelijks gebruik
+- Open de link, klik door het dashboard en pas gegevens aan; alles wordt direct opgeslagen in Supabase.
+- **Rol wisselen** (demo): keuzelijst rechtsboven.
+- **Exports** (Excel, CSV, JSON, Print/PDF) worden in je browser gemaakt.
+- **Import** (Excel/CSV/JSON) via *Beheer → Import en export*, met voorbeeld en bevestiging.
+- **Back-up**: Supabase maakt dagelijks back-ups (gratis plan: beperkte bewaartijd). Extra zekerheid: exports, of
+  `pg_dump` met de connection string.
+- **Gratis Supabase pauzeert** na een week zonder gebruik. Het dashboard meldt dan dat de database niet bereikbaar is;
+  zet het project in Supabase weer aan (*Restore project*). Je gegevens blijven bewaard.
 
-## Snel starten (ontwikkeling)
-
-Vereisten: Node.js 20+ (getest met 22) en PostgreSQL 14+ (getest met 16).
+## Lokaal ontwikkelen
+Vereisten: Node.js 22 en PostgreSQL (lokaal of Supabase).
 
 ```bash
 npm install
 ```
 
-```bash
-cp .env.example .env.local
-```
-
-Start een database (één van beide):
-
-```bash
-docker compose up -d db
-```
-
-of gebruik een lokale PostgreSQL en maak de database aan:
-
-```bash
-createdb di_portfolio_dev
-```
-
-Pas `DATABASE_URL` in `.env.local` aan (bij Docker: `postgres://postgres:ontwikkel@localhost:5432/di_portfolio_dev`) en zet een `SESSION_SECRET` van minimaal 32 tekens. Daarna:
+Met een lokale PostgreSQL (database `di_portfolio_dev`) en een nabootsing van de Supabase-API:
 
 ```bash
 npm run db:setup
 ```
 
 ```bash
+npm run dev:gateway
+```
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:3000 en kies op het inlogscherm een **fictieve gebruiker** (één per rol). Deze ontwikkel-login is in productie uitgeschakeld.
+Zet in `.env.local`: `DATABASE_URL=postgres://postgres@localhost:5432/di_portfolio_dev`,
+`NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321` en `NEXT_PUBLIC_SUPABASE_ANON_KEY=lokaal`. Zie `.env.example`.
 
 ## Scripts
 
 | Script | Doel |
 |---|---|
-| `npm run dev` | Ontwikkelserver |
-| `npm run build` / `npm start` | Productiebuild / starten (output `standalone`) |
-| `npm run db:migrate` | SQL-migraties uit `db/migrations` uitvoeren (idempotent, geregistreerd in `schema_migrations`) |
-| `npm run db:seed` | Idempotente seed: pijlers, onderwerpen, rollen, model, instellingen, voorbeelddefinities |
-| `npm run db:setup` | Migreren + seeden |
-| `npm test` | Unit- en integratietests (integratie alleen met `TEST_DATABASE_URL`) |
-| `npm run test:db:setup` | Testdatabase (`.env.test`) migreren en seeden |
-| `npm run test:integration` | Databasetests voor RLS, constraints en audit |
+| `npm run dev` | Ontwikkelserver (http://localhost:3000) |
+| `npm run build` | Statische site bouwen in `out/` |
+| `npm run db:migrate` / `db:seed` / `db:setup` | Migraties, seed (idempotent), of beide |
+| `npm run dev:gateway` | Lokale nabootsing van de Supabase-API (poort 54321) |
+| `npm test` | Unit- en database-integratietests (integratie met `TEST_DATABASE_URL`) |
+| `npm run test:e2e` | Rooktest van alle schermen per rol (Playwright) |
 | `npm run typecheck` / `npm run lint` | Statische controles |
-
-Testdatabase eenmalig aanmaken:
-
-```bash
-createdb di_portfolio_test && npm run test:db:setup
-```
-
-```bash
-TEST_DATABASE_URL=postgres://postgres@localhost:5432/di_portfolio_test npm test
-```
-
-## Configuratie per omgeving
-
-- **Ontwikkeling**: `.env.local` (op basis van `.env.example`), `AUTH_MODE=dev`, fictieve gebruikers.
-- **Test**: `.env.test` (in git, zonder geheimen), eigen database `di_portfolio_test`.
-- **Productie**: zie `.env.production.example`; geheimen uitsluitend via de secret store van het platform. `AUTH_MODE=entra`, `SEED_DEV_USERS=false`.
 
 ## Documentatie
 
 | Document | Inhoud |
 |---|---|
 | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Organisatorische context, uitgangspunten, terminologie |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Architectuur, keuzes en afwijkingen van de voorkeursstack |
-| [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) | Datamodel, ERD, RLS, audit en rekenregels |
-| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Design tokens, huisstijl-aannames, toegankelijkheid |
-| [SECURITY.md](SECURITY.md) | Beveiliging, privacy, hosting, Entra ID, compliance-afbakening |
-| [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Fasering, status, backlog |
-| [LOKAAL-GEBRUIK.md](LOKAAL-GEBRUIK.md) | Lokaal gebruik met Docker op Windows: starten, stoppen, back-up, herstel |
-| [CLAUDE.md](CLAUDE.md) | Ontwikkelregels voor (AI-)ontwikkelaars |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Architectuur en keuzes |
+| [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) | Datamodel, ERD, rechtenregels, audit |
+| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Huisstijl (afgeleid uit het sjabloon), tokens, toegankelijkheid |
+| [SECURITY.md](SECURITY.md) | Beveiliging, demo-risico's, weg naar gemeentelijke hosting |
+| [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Fasering en vervolg |
+| [CLAUDE.md](CLAUDE.md) | Ontwikkelregels |
 
-## Belangrijke opmerkingen
-
-- **Aantal onderwerpen**: de opdracht noemt 120 onderwerpen, maar de opsomming bevat er **122** (13+18+19+20+15+17+20). Alle 122 zijn opgenomen.
-- **Huisstijl**: logo, golfvormen en merkkleuren zijn afgeleid uit het officiële presentatiesjabloon (`Huisstijl_.pdf`). Officiële kleurcodes, lettertype en logogebruiksregels zijn nog te verifiëren bij Communicatie (zie DESIGN_SYSTEM.md).
-- **Geen fictieve inhoud**: er zijn geen eigenaren, budgetten, capaciteit, prioriteiten, voortgang of KPI-waarden verzonnen. Onbekend wordt als "Onbekend" / "Nog niet beoordeeld" getoond, nooit als 0.
-- **Medewerkersinput**: er was geen Excel-bestand met oorspronkelijke input aanwezig. De importfunctie (Beheer → Import en export → Medewerkersinput) bewaart rijen ongewijzigd en koppelt ze herleidbaar aan onderwerpen.
+## Opmerkingen
+- De opdracht noemt 120 onderwerpen; de opsomming bevat er **122**. Alle 122 zijn opgenomen.
+- Er zijn geen eigenaren, budgetten, capaciteit, prioriteiten, voortgang of KPI-waarden verzonnen. Onbekend wordt als
+  "Onbekend" of "Nog niet beoordeeld" getoond, nooit als 0.

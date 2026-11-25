@@ -1,5 +1,6 @@
+"use client";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { AsyncPage, notFound } from "@/components/async-page";
 import { z } from "zod";
 import type { ReactNode } from "react";
 import { db } from "@/lib/auth/current-user";
@@ -18,7 +19,18 @@ import { Badge } from "@/components/ui/badge";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import type { Db } from "@/lib/db";
 
-export async function RegisterListPage({ registerKey, above, filter, actions }: {
+type ListProps = Parameters<typeof loadRegisterListPage>[0];
+type DetailProps = Parameters<typeof loadRegisterDetailPage>[0];
+
+/** Zelfladende registerschermen (gegevens worden in de browser opgehaald). */
+export function RegisterListPage(props: ListProps) {
+  return <AsyncPage render={() => loadRegisterListPage(props)} />;
+}
+export function RegisterDetailPage(props: DetailProps) {
+  return <AsyncPage render={() => loadRegisterDetailPage(props)} />;
+}
+
+async function loadRegisterListPage({ registerKey, above, filter, actions }: {
   registerKey: string; above?: (d: Db, u: CurrentUser) => Promise<ReactNode>; filter?: Record<string, string>; actions?: ReactNode;
 }) {
   const def = getRegister(registerKey);
@@ -38,7 +50,7 @@ export async function RegisterListPage({ registerKey, above, filter, actions }: 
   );
 }
 
-export async function RegisterDetailPage({ registerKey, id, extra }: {
+async function loadRegisterDetailPage({ registerKey, id, extra }: {
   registerKey: string; id: string; extra?: (d: Db, record: Record<string, unknown>, user: CurrentUser) => Promise<ReactNode>;
 }) {
   const def = getRegister(registerKey);

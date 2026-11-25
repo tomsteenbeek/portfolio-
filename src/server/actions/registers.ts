@@ -1,4 +1,3 @@
-"use server";
 import { z } from "zod";
 import { withUser } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/current-user";
@@ -59,7 +58,7 @@ export async function saveRecord(_: ActionResult | null, fd: FormData): Promise<
       }
       const r = await db.one<{ id: string }>(`insert into ${def.table}(${cols.join(",")}) values (${cols.map((_, i) => `$${i + 1}`).join(",")}) returning id`,
         cols.map((c) => values[c]));
-      return { ok: true, message: `${def.singular[0].toUpperCase()}${def.singular.slice(1)} toegevoegd`, redirect: `${def.path}/${r!.id}` };
+      return { ok: true, message: `${def.singular[0].toUpperCase()}${def.singular.slice(1)} toegevoegd`, redirect: `${def.path}/detail?id=${r!.id}` };
     });
   });
 }

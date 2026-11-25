@@ -1,4 +1,3 @@
-"use server";
 import ExcelJS from "exceljs";
 import Papa from "papaparse";
 import { z } from "zod";
@@ -15,11 +14,11 @@ type Row = Record<string, string>;
 async function parseFile(file: File): Promise<{ headers: string[]; rows: Row[] }> {
   if (file.size > MAX_BYTES) throw Object.assign(new Error("Bestand is groter dan 10 MB."), { code: "P0001" });
   const name = file.name.toLowerCase();
-  const buf = Buffer.from(await file.arrayBuffer());
+  const buf = await file.arrayBuffer();
   let rows: Row[] = [];
   if (name.endsWith(".xlsx")) {
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(buf as unknown as ArrayBuffer);
+    await wb.xlsx.load(buf);
     const ws = wb.worksheets[0];
     if (!ws) throw Object.assign(new Error("Geen werkblad gevonden."), { code: "P0001" });
     const headers: string[] = [];
@@ -31,11 +30,11 @@ async function parseFile(file: File): Promise<{ headers: string[]; rows: Row[] }
       if (Object.values(o).some(Boolean)) rows.push(o);
     });
   } else if (name.endsWith(".csv")) {
-    const text = buf.toString("utf8").replace(/^﻿/, "");
+    const text = new TextDecoder("utf-8").decode(buf).replace(/^\uFEFF/, "");
     const res = Papa.parse<Row>(text, { header: true, skipEmptyLines: true, delimiter: "", transformHeader: (h) => h.trim() });
     rows = res.data.map((r) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, String(v ?? "").trim()])));
   } else if (name.endsWith(".json")) {
-    const data = JSON.parse(buf.toString("utf8"));
+    const data = JSON.parse(new TextDecoder("utf-8").decode(buf));
     const arr = Array.isArray(data) ? data : Array.isArray(data?.rows) ? data.rows : null;
     if (!arr) throw Object.assign(new Error("JSON moet een lijst van objecten zijn."), { code: "P0001" });
     rows = arr.map((r: Record<string, unknown>) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, v === null || v === undefined ? "" : typeof v === "object" ? JSON.stringify(v) : String(v)])));

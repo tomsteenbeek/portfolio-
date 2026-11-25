@@ -1,3 +1,5 @@
+"use client";
+import { AsyncPage } from "@/components/async-page";
 import Link from "next/link";
 import { AlertTriangle, Clock, Gavel, Printer, ShieldAlert } from "lucide-react";
 import { db } from "@/lib/auth/current-user";
@@ -13,9 +15,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LinkButton } from "@/components/ui/button";
 import { fmtDate, fmtEuro, fmtHours, fmtInt } from "@/lib/format";
 
-export const metadata = { title: "Managementdashboard" };
+export default function DashboardPage() {
+  return <AsyncPage render={async () => {
 
-export default async function DashboardPage() {
   const data = await db(async (d, user) => {
     const settings = await getSettings(d);
     const year = Number(settings["jaarplan.actief_jaar"] ?? 2027);
@@ -88,7 +90,7 @@ export default async function DashboardPage() {
           {charts.topRisks.length === 0 ? <EmptyState icon={<ShieldAlert className="h-8 w-8" />} title="Nog geen risico's geregistreerd" /> : (
             <ul className="divide-y divide-line">
               {charts.topRisks.map((r) => (
-                <li key={r.id}><Link href={`/risicos/${r.id}`} className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-surface-muted">
+                <li key={r.id}><Link href={`/risicos/detail?id=${r.id}`} className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-surface-muted">
                   <span className="min-w-0"><span className="text-[12px] text-muted">{r.number} · {r.category}{r.pillar ? ` · Pijler ${r.pillar}` : ""}</span><span className="block truncate text-sm">{r.title}</span></span>
                   <Badge tone={r.score >= 15 ? "bad" : r.score >= 8 ? "warn" : "ok"}>Score {r.score}</Badge>
                 </Link></li>
@@ -126,7 +128,7 @@ export default async function DashboardPage() {
           {charts.insufficient.length === 0 ? <EmptyState icon={<AlertTriangle className="h-8 w-8" />} title="Nog niets gesignaleerd" description="Vul haalbaarheidsbeoordelingen in via Prioritering → Haalbaarheid." /> : (
             <ul className="divide-y divide-line">
               {charts.insufficient.map((t) => (
-                <li key={t.id}><Link href={`/onderwerpen/${t.id}`} className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-surface-muted">
+                <li key={t.id}><Link href={`/onderwerpen/detail?id=${t.id}`} className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-surface-muted">
                   <span className="min-w-0 truncate text-sm">{t.code} {t.title}</span>
                   <span className="flex shrink-0 gap-1">{t.flags && <Badge tone="accent">Verplicht</Badge>}{t.reasons.map((r) => <Badge key={r} tone="bad">{r}</Badge>)}</span>
                 </Link></li>
@@ -140,4 +142,6 @@ export default async function DashboardPage() {
       </p>
     </>
   );
+
+  }} />;
 }

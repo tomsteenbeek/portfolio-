@@ -1,4 +1,5 @@
 "use client";
+import { refreshData } from "@/lib/refresh";
 import { useActionState, useEffect, useRef, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
@@ -40,7 +41,7 @@ export function ActionForm({ action, children, success = "Opgeslagen", className
       onSuccess?.(state);
       if (!state.redirect) closeDialog?.();
       if (state.redirect) router.push(state.redirect);
-      else router.refresh();
+      else refreshData();
     } else {
       toast("error", state.error);
     }

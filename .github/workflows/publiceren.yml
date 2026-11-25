@@ -1,0 +1,66 @@
+# Publiceert het dashboard op GitHub Pages bij elke wijziging op main.
+# Eenmalig instellen (zie README > Publiceren):
+#   Settings → Pages → Source: "GitHub Actions"
+#   Settings → Secrets and variables → Actions
+#     Variables: SUPABASE_URL, SUPABASE_ANON_KEY
+#     Secret:    SUPABASE_DB_URL  (connection string, Session pooler)
+name: Publiceren op GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  bouwen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Controles (types en unit-tests)
+        run: npm run typecheck && npx vitest run tests/priority.test.ts tests/stats-feasibility-capacity.test.ts
+      - name: Database bijwerken (migraties en seed, herhaalbaar)
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DATABASE_SSL: "true"
+          DATABASE_SSL_VERIFY: "false"
+          SEED_DEV_USERS: "true"
+          APP_ENV: production
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "::warning::Secret SUPABASE_DB_URL ontbreekt: database niet bijgewerkt"; exit 0; fi
+          npm run db:setup
+      - name: Statische site bouwen
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+        run: |
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then echo "::error::Variabelen SUPABASE_URL en SUPABASE_ANON_KEY ontbreken (Settings → Secrets and variables → Actions → Variables)"; exit 1; fi
+          npm run build
+          touch out/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  publiceren:
+    needs: bouwen
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4

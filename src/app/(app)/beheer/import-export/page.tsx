@@ -1,4 +1,8 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import { z } from "zod";
+import { ExportButtons } from "@/components/common/export-buttons";
+import type { ReportKey } from "@/server/reports";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { PageHeader } from "@/components/ui/page-header";
@@ -8,15 +12,16 @@ import { MappingStep, UploadForm } from "@/components/import/import-wizard";
 import { IMPORT_KINDS } from "@/lib/import-config";
 import { fmtDateTime } from "@/lib/format";
 
-export const metadata = { title: "Import en export" };
-
-const REPORTS = [
+const REPORTS: { key: ReportKey; label: string }[] = [
   { key: "jaarplan", label: "Jaarplan (actief jaar)" }, { key: "directie", label: "Directierapportage" }, { key: "portfolio", label: "Projectportfolio" },
   { key: "inventarisatie", label: "Totale inventarisatie" }, { key: "prioritering", label: "Prioriteringsresultaten" }, { key: "formatie", label: "Formatieanalyse" },
   { key: "capaciteit", label: "Capaciteitsplanning" }, { key: "risicos", label: "Risicoregister" }, { key: "roadmap", label: "Meerjarenroadmap" },
 ];
 
-export default async function ImportExportPage({ searchParams }: { searchParams: Promise<{ batch?: string }> }) {
+export default function ImportExportPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
+
   const { batch } = await searchParams;
   const d = await db(async (x, user) => ({
     user,
@@ -41,10 +46,7 @@ export default async function ImportExportPage({ searchParams }: { searchParams:
             {REPORTS.map((r) => (
               <li key={r.key} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                 <span className="font-medium">{r.label}</span>
-                <form method="post" action="/api/export/report" target="_blank" className="flex gap-1">
-                  <input type="hidden" name="report" value={r.key} />
-                  {[["xlsx", "Excel"], ["csv", "CSV"], ["json", "JSON"], ["html", "Print / PDF"]].map(([f, l]) => <button key={f} name="format" value={f} className="h-8 rounded-md border border-line-strong bg-surface px-2.5 text-[13px] hover:bg-surface-muted">{l}</button>)}
-                </form>
+                <ExportButtons report={r.key} formats={["xlsx", "csv", "json", "html"]} size="sm" />
               </li>
             ))}
           </ul>
@@ -59,4 +61,6 @@ export default async function ImportExportPage({ searchParams }: { searchParams:
       </div>
     </>
   );
+
+  }} />;
 }

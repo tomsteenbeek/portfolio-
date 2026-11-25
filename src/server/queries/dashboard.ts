@@ -1,4 +1,3 @@
-import "server-only";
 import type { Db } from "@/lib/db";
 
 /**
@@ -147,24 +146,24 @@ export async function dashboardCharts(db: Db, year: number) {
       db.query<{ kind: string; title: string; date: string; href: string }>(
         `select * from (
            select 'Mijlpaal' as kind, m.title || coalesce(' – ' || j.name, '') as title, m.due_date::text as date,
-                  coalesce('/projecten/' || j.id, '/roadmap') as href
+                  coalesce('/projecten/detail?id=' || j.id, '/roadmap') as href
              from milestones m left join projects j on j.id = m.project_id where m.status = 'Open' and m.due_date >= current_date
            union all
-           select 'Wettelijke deadline', t.code || ' ' || t.title, t.legal_deadline::text, '/onderwerpen/' || t.id
+           select 'Wettelijke deadline', t.code || ' ' || t.title, t.legal_deadline::text, '/onderwerpen/detail?id=' || t.id
              from topics t where t.legal_deadline >= current_date and t.archived_at is null
            union all
            select 'Regelgeving', r.name, r.deadline::text, '/wetgeving' from regulatory_requirements r where r.deadline >= current_date
            union all
-           select 'Risicomaatregel', r.number || ' ' || r.title, r.deadline::text, '/risicos/' || r.id
+           select 'Risicomaatregel', r.number || ' ' || r.title, r.deadline::text, '/risicos/detail?id=' || r.id
              from risks r where r.deadline >= current_date and r.archived_at is null and r.stage <> 'Gesloten'
          ) x order by date limit 8`,
       ),
       db.query<{ id: string; label: string; href: string; kind: string }>(
         `select * from (
-           select j.id, j.number || ' ' || j.name as label, '/projecten/' || j.id as href, 'Project ter besluitvorming' as kind
+           select j.id, j.number || ' ' || j.name as label, '/projecten/detail?id=' || j.id as href, 'Project ter besluitvorming' as kind
              from projects j where j.status = 'Ter besluitvorming' and j.archived_at is null
            union all
-           select d.id, d.number || ' ' || d.subject, '/besluiten/' || d.id, 'Openstaand besluit'
+           select d.id, d.number || ' ' || d.subject, '/besluiten/detail?id=' || d.id, 'Openstaand besluit'
              from decisions d where d.outcome = 'Openstaand' and d.archived_at is null
          ) x limit 8`,
       ),

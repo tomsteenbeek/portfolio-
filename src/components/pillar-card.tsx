@@ -35,7 +35,7 @@ export function PriorityDistribution({ p1, p2, p3, p4, unprioritized }: { p1: nu
 export function PillarCard({ p, canFinance }: { p: P; canFinance: boolean }) {
   const risk = riskTone(p.max_risk);
   return (
-    <Link href={`/pijlers/${p.number}`} className="group flex flex-col rounded-lg border border-line bg-surface p-4 shadow-card transition-colors hover:border-primary">
+    <Link href={`/pijlers/detail?nr=${p.number}`} className="group flex flex-col rounded-lg border border-line bg-surface p-4 shadow-card transition-colors hover:border-primary">
       <div className="flex items-start justify-between gap-2">
         <div className="text-[12px] font-semibold uppercase tracking-wide text-primary">Pijler {p.number}</div>
         <ArrowUpRight aria-hidden className="h-4 w-4 text-subtle group-hover:text-primary" />

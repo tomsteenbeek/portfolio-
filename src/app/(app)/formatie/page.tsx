@@ -1,4 +1,7 @@
+"use client";
+import { AsyncPage, spObject } from "@/components/async-page";
 import Link from "next/link";
+import { ExportButtons } from "@/components/common/export-buttons";
 import { db } from "@/lib/auth/current-user";
 import { can } from "@/lib/auth/permissions";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,11 +16,12 @@ import { capacityFor, type CapacityAssumptions } from "@/lib/capacity";
 import { fmtEuro, fmtFte, fmtHours } from "@/lib/format";
 import { PrintButton } from "@/components/common/print-button";
 
-export const metadata = { title: "Formatie en bezetting" };
-
 type Pos = { id: string; title: string; discipline_id: string; discipline: string; subteam: string | null; fte: number; kind: string; occupancy: string; occupied_fte: number | null; user_name: string | null; annual_cost: number | null; contract_hours_per_week: number | null; notes: string | null; user_id: string | null };
 
-export default async function StaffingPage({ searchParams }: { searchParams: Promise<{ tab?: string; scenario?: string }> }) {
+export default function StaffingPage() {
+  return <AsyncPage render={async (__sp) => {
+    const searchParams = Promise.resolve(spObject(__sp));
+
   const { tab = "overzicht", scenario } = await searchParams;
   const d = await db(async (x, user) => {
     if (!can(user.roles, "staffing.view")) return null;
@@ -58,7 +62,7 @@ export default async function StaffingPage({ searchParams }: { searchParams: Pro
     <>
       <PageHeader title="Formatie en bezetting" crumbs={[{ label: "Organisatie" }, { label: "Formatie en bezetting" }]}
         description="Vastgestelde formatie, feitelijke bezetting, vacatures, inhuur en organisatiescenario's. Strategische pijlers zijn geen organisatorische teams."
-        actions={<><PrintButton /><form method="post" action="/api/export/report"><input type="hidden" name="report" value="formatie" /><button name="format" value="xlsx" className="h-9 rounded-md border border-line-strong bg-surface px-3.5 text-sm hover:bg-surface-muted">Excel</button></form>
+        actions={<><PrintButton /><ExportButtons report="formatie" />
           {edit && <Dialog trigger="Nieuwe positie" triggerVariant="primary" title="Positie toevoegen" wide><PositionForm disciplines={d.disciplines} users={d.users} /></Dialog>}</>} />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
         <Stat label="Vastgestelde formatie" value={fmtFte(formal)} />
@@ -169,4 +173,6 @@ export default async function StaffingPage({ searchParams }: { searchParams: Pro
       )}
     </>
   );
+
+  }} />;
 }
