@@ -55,6 +55,14 @@ grant app_user to di_app_login;   -- mag uitsluitend app_user aannemen
 ```
 
 Migraties draaien met een apart beheeraccount (eigenaar van het schema), niet met het applicatie-account.
+Migratie 0004 geeft het verbindingsaccount zelf het recht om `app_user` aan te nemen (PostgreSQL 16 vereist daarvoor
+expliciet SET-recht); lukt dat niet, dan stopt de migratie met de exacte `GRANT` die een beheerder moet uitvoeren.
+
+### Lokale Docker-installatie
+
+`docker-compose.yml` publiceert de app alleen op `127.0.0.1` (niet bereikbaar vanaf het netwerk) en de database helemaal
+niet. De ontwikkel-login met fictieve gebruikers staat daar bewust aan (`ALLOW_DEV_LOGIN=true`); gebruik deze opzet dus
+niet ongewijzigd op een server die voor anderen bereikbaar is.
 
 ## Back-up en herstel
 

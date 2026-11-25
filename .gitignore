@@ -47,3 +47,6 @@ next-env.d.ts
 
 # lokale database (ontwikkeling)
 /.pgdata
+
+# lokale back-ups
+/backups

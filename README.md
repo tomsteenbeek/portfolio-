@@ -18,6 +18,11 @@ strategische planning, jaarplan, gezamenlijke prioritering, portfolio-, project-
 
 Zie [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) voor vervolgstappen.
 
+## Lokaal gebruiken (aanbevolen voor de teamleider)
+
+Dashboard + database op je eigen computer met Docker Desktop: dubbelklik op **`start.bat`** en open http://localhost:3000.
+Zie **[LOKAAL-GEBRUIK.md](LOKAAL-GEBRUIK.md)** voor installatie, back-up en herstel.
+
 ## Snel starten (ontwikkeling)
 
 Vereisten: Node.js 20+ (getest met 22) en PostgreSQL 14+ (getest met 16).
@@ -94,6 +99,7 @@ TEST_DATABASE_URL=postgres://postgres@localhost:5432/di_portfolio_test npm test
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Design tokens, huisstijl-aannames, toegankelijkheid |
 | [SECURITY.md](SECURITY.md) | Beveiliging, privacy, hosting, Entra ID, compliance-afbakening |
 | [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Fasering, status, backlog |
+| [LOKAAL-GEBRUIK.md](LOKAAL-GEBRUIK.md) | Lokaal gebruik met Docker op Windows: starten, stoppen, back-up, herstel |
 | [CLAUDE.md](CLAUDE.md) | Ontwikkelregels voor (AI-)ontwikkelaars |
 
 ## Belangrijke opmerkingen

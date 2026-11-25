@@ -33,7 +33,8 @@ export async function verifySession(token: string | undefined): Promise<SessionP
 export const sessionCookieOptions = {
   httpOnly: true,
   sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
+  // Secure-cookies in productie; uit te zetten voor lokaal gebruik via http://localhost
+  secure: process.env.NODE_ENV === "production" && process.env.COOKIE_SECURE !== "false",
   path: "/",
   maxAge: MAX_AGE_SECONDS,
 };
