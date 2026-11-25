@@ -99,6 +99,6 @@ TEST_DATABASE_URL=postgres://postgres@localhost:5432/di_portfolio_test npm test
 ## Belangrijke opmerkingen
 
 - **Aantal onderwerpen**: de opdracht noemt 120 onderwerpen, maar de opsomming bevat er **122** (13+18+19+20+15+17+20). Alle 122 zijn opgenomen.
-- **Huisstijl**: de gemeentelijke website was vanuit de ontwikkelomgeving niet bereikbaar. Kleuren en typografie zijn daarom neutrale, configureerbare **aannames** (zie DESIGN_SYSTEM.md).
+- **Huisstijl**: logo, golfvormen en merkkleuren zijn afgeleid uit het officiële presentatiesjabloon (`Huisstijl_.pdf`). Officiële kleurcodes, lettertype en logogebruiksregels zijn nog te verifiëren bij Communicatie (zie DESIGN_SYSTEM.md).
 - **Geen fictieve inhoud**: er zijn geen eigenaren, budgetten, capaciteit, prioriteiten, voortgang of KPI-waarden verzonnen. Onbekend wordt als "Onbekend" / "Nog niet beoordeeld" getoond, nooit als 0.
 - **Medewerkersinput**: er was geen Excel-bestand met oorspronkelijke input aanwezig. De importfunctie (Beheer → Import en export → Medewerkersinput) bewaart rijen ongewijzigd en koppelt ze herleidbaar aan onderwerpen.

@@ -2,64 +2,74 @@
 
 /* =====================================================================
    Design tokens – Digitale Informatie | Strategie & Portfolio
-   LET OP: officiële huisstijlwaarden van de gemeente konden niet worden
-   vastgesteld (website niet bereikbaar vanuit de ontwikkelomgeving).
-   Onderstaande waarden zijn neutrale AANNAMES; vervang ze in dit blok
-   (of via src/config/brand.ts voor teksten/logo). Zie DESIGN_SYSTEM.md.
+   Merkkleuren afgeleid uit het officiële presentatiesjabloon van de
+   gemeente (Huisstijl_.pdf, logo en golfvormen; gemeten op de weergave).
+   Officiële kleurcodes uit een huisstijlhandboek zijn (nog) niet bekend:
+   vervang ze hier zodra Communicatie ze aanlevert. Zie DESIGN_SYSTEM.md.
    ===================================================================== */
 :root {
-  /* Merk */
-  --brand-primary: #164a5e;        /* aanname: donker petrol */
-  --brand-primary-hover: #0f3746;
-  --brand-primary-soft: #e6eff2;
-  --brand-secondary: #4a5f66;      /* aanname: leisteen */
-  --brand-accent: #b4532a;         /* aanname: terracotta, spaarzaam gebruiken */
-  --brand-accent-soft: #f7ebe4;
+  /* Merkpalet (gemeten in sjabloon) */
+  --brand-blue: #3e7ab4;           /* woordmerk 'Bodegraven Reeuwijk' – 4,5:1 op wit */
+  --brand-green: #52b67a;          /* golf groen – decoratief (te licht voor tekst) */
+  --brand-yellow: #dee271;         /* golf geel – decoratief */
+  --brand-lime: #94c24d;           /* golf lichtgroen – decoratief */
+  --brand-sky: #399fd5;            /* golf lichtblauw – decoratief */
+
+  /* Toepassing in de interface (AA-veilige tinten uit dezelfde kleurfamilie) */
+  --brand-primary: #2f6aa3;        /* knoppen, links, actieve staat – 5,7:1 op wit */
+  --brand-primary-hover: #245485;
+  --brand-primary-soft: #e9f0f8;
+  --brand-secondary: #1f6b40;      /* donkergroen voor tekst – 6,5:1 op wit */
+  --brand-accent: #4d520a;         /* markering verplicht/urgent: tekst op geel vlak – 7,6:1 */
+  --brand-accent-soft: #f5f7d2;
+  --brand-accent-ring: #b9c12e;    /* geel-groene rand (niet-tekst) */
 
   /* Neutraal */
-  --bg: #f6f7f8;
+  --bg: #f5f7fa;
   --surface: #ffffff;
-  --surface-muted: #f1f3f4;
-  --sidebar-bg: #102f3b;
-  --sidebar-fg: #d9e4e8;
-  --sidebar-muted: #8fa9b2;
-  --text: #182226;
-  --text-muted: #55636a;           /* ≥ 4.5:1 op wit */
-  --text-subtle: #6b787e;
-  --border: #dde2e5;
-  --border-strong: #c3cbcf;
+  --surface-muted: #f0f3f7;
+  --sidebar-bg: #ffffff;
+  --sidebar-fg: #1a2a3a;
+  --sidebar-muted: #5f6f7f;
+  --sidebar-active-bg: #e9f0f8;
+  --sidebar-active-fg: #1c4a7a;
+  --text: #1a2a3a;
+  --text-muted: #506070;           /* 6,5:1 op wit */
+  --text-subtle: #66768a;
+  --border: #dbe2ea;
+  --border-strong: #bfcad6;
 
   /* Status (tekstkleuren voldoen aan AA op lichte achtergrond) */
-  --status-green: #22704a;
-  --status-green-bg: #e7f3ec;
+  --status-green: #1f6b40;
+  --status-green-bg: #e6f4ec;
   --status-amber: #8a5a0b;
   --status-amber-bg: #fbf1dc;
   --status-red: #a52a1f;
   --status-red-bg: #fbe9e7;
-  --status-blue: #1f5c99;
-  --status-blue-bg: #e7eff8;
-  --status-gray: #55636a;
-  --status-gray-bg: #eef0f1;
+  --status-blue: #1c4a7a;
+  --status-blue-bg: #e9f0f8;
+  --status-gray: #506070;
+  --status-gray-bg: #edf0f4;
 
-  /* Prioriteit */
-  --p1: #0f3746;
-  --p2: #3b7385;
-  --p3: #79a6b3;
-  --p4: #bdd5dc;
+  /* Prioriteit: één tint (merkblauw), donker → licht; label altijd zichtbaar */
+  --p1: #1c4a7a;
+  --p2: #3e7ab4;
+  --p3: #9dbcdc;
+  --p4: #cfdeee;
 
   /* Grafiekreeksen (gevalideerd op CVD-scheiding en contrast) */
-  --chart-1: #0f74a0;
-  --chart-2: #c0672f;
-  --chart-grid: #e6eaec;
+  --chart-1: #2f6aa3;
+  --chart-2: #2f8a55;
+  --chart-grid: #e4e9ef;
 
   /* Volwassenheid 1..5 */
-  --m1: #c9d6db;
-  --m2: #9db5be;
-  --m3: #6c929f;
-  --m4: #3e6f80;
-  --m5: #164a5e;
+  --m1: #cfdeee;
+  --m2: #9dbcdc;
+  --m3: #6a9bcb;
+  --m4: #3e7ab4;
+  --m5: #1c4a7a;
 
-  /* Typografie */
+  /* Typografie (lettertype woordmerk niet vastgesteld; systeemlettertype) */
   --font-sans: "Segoe UI", "Source Sans 3", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
@@ -68,8 +78,8 @@
   --radius-sm: 4px;
   --radius: 6px;
   --radius-lg: 10px;
-  --shadow-card: 0 1px 2px rgb(16 47 59 / 0.06), 0 1px 1px rgb(16 47 59 / 0.04);
-  --focus-ring: #1f5c99;
+  --shadow-card: 0 1px 2px rgb(28 74 122 / 0.06), 0 1px 1px rgb(28 74 122 / 0.04);
+  --focus-ring: #1c4a7a;
 }
 
 @theme inline {
@@ -85,6 +95,13 @@
   --color-sidebar: var(--sidebar-bg);
   --color-sidebar-fg: var(--sidebar-fg);
   --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-active: var(--sidebar-active-bg);
+  --color-sidebar-active-fg: var(--sidebar-active-fg);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-green: var(--brand-green);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-lime: var(--brand-lime);
+  --color-brand-sky: var(--brand-sky);
   --color-ink: var(--text);
   --color-muted: var(--text-muted);
   --color-subtle: var(--text-subtle);
@@ -139,8 +156,11 @@ h1, h2, h3, h4 {
   outline-offset: 2px;
   border-radius: 2px;
 }
-.sidebar :focus-visible {
-  outline-color: #ffffff;
+/* Decoratieve merkgolven (uit sjabloon) */
+.brand-waves {
+  background-image: url("/brand/waves.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 .skip-link {

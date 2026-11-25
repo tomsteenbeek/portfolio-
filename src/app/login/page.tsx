@@ -25,18 +25,21 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     : [];
   return (
     <main className="min-h-screen grid lg:grid-cols-[1fr_520px]">
-      <section className="hidden lg:flex flex-col justify-between bg-sidebar p-12 text-sidebar-fg">
-        <div className="text-sm text-sidebar-muted">{BRAND.organisation}</div>
-        <div>
-          <h1 className="text-4xl font-semibold leading-tight text-white">{BRAND.appName}<br /><span className="text-sidebar-muted font-normal">{BRAND.appSubtitle}</span></h1>
-          <p className="mt-6 max-w-md text-[17px] leading-relaxed">
+      <section className="brand-waves hidden lg:flex flex-col justify-between p-12" aria-label="Over deze applicatie">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={BRAND.logoUrl} alt={BRAND.organisation} className="h-12 w-auto self-start" />
+        <div className="max-w-lg rounded-lg bg-surface/85 p-8 backdrop-blur-sm">
+          <h1 className="text-4xl font-semibold leading-tight text-[var(--sidebar-active-fg)]">{BRAND.appName}<br /><span className="font-normal text-muted">{BRAND.appSubtitle}</span></h1>
+          <p className="mt-6 text-[17px] leading-relaxed text-ink">
             Van reactief beheer naar proactieve regie – een betrouwbare digitale basis voor een toekomstbestendige gemeente.
           </p>
         </div>
-        <div className="text-[12px] text-sidebar-muted">Intern gebruik · team Digitale Informatie</div>
+        <div className="text-[12px] text-muted">Intern gebruik · team Digitale Informatie</div>
       </section>
       <section className="flex items-center justify-center p-6 sm:p-12 bg-surface">
         <div className="w-full max-w-sm">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BRAND.logoUrl} alt={BRAND.organisation} className="mb-8 h-10 w-auto lg:hidden" />
           <h2 className="text-2xl font-semibold">Inloggen</h2>
           {sp.error && <p role="alert" className="mt-3 rounded-md bg-bad-bg px-3 py-2 text-sm text-bad">{sp.error}</p>}
           {entra && (

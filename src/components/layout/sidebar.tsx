@@ -31,7 +31,7 @@ export function Sidebar({ groups }: { groups: NavGroup[] }) {
     <>
       <button
         type="button"
-        className="fixed left-3 top-3 z-40 rounded-md bg-sidebar p-2 text-white lg:hidden no-print"
+        className="fixed left-3 top-3 z-40 rounded-md border border-line bg-surface p-2 text-ink shadow-card lg:hidden no-print"
         aria-label={mobileOpen ? "Menu sluiten" : "Menu openen"}
         aria-expanded={mobileOpen}
         onClick={() => setMobileOpen((o) => !o)}
@@ -40,22 +40,20 @@ export function Sidebar({ groups }: { groups: NavGroup[] }) {
       </button>
       <aside
         className={cn(
-          "sidebar no-print fixed inset-y-0 left-0 z-30 flex flex-col bg-sidebar text-sidebar-fg transition-[width,transform] duration-150",
+          "sidebar no-print fixed inset-y-0 left-0 z-30 flex flex-col border-r border-line bg-sidebar text-sidebar-fg transition-[width,transform] duration-150",
           collapsed ? "lg:w-[64px]" : "lg:w-[256px]",
           "w-[272px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
         aria-label="Hoofdnavigatie"
       >
-        <div className={cn("flex items-center gap-3 border-b border-white/10 px-4 h-16 shrink-0", collapsed && "lg:justify-center lg:px-0")}>
-          {BRAND.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={BRAND.logoUrl} alt={BRAND.organisation} className="h-8 w-8 object-contain" />
-          ) : (
-            <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded bg-white/10 text-[13px] font-semibold text-white">DI</span>
-          )}
-          <div className={cn("min-w-0 leading-tight", collapsed && "lg:hidden")}>
-            <div className="text-[14px] font-semibold text-white">{BRAND.appName}</div>
+        <div className={cn("border-b border-line px-4 py-3 shrink-0", collapsed && "lg:px-2")}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BRAND.logoUrl} alt={BRAND.organisation} className={cn("h-9 w-auto max-w-full object-contain", collapsed && "lg:hidden")} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BRAND.markUrl} alt={BRAND.organisation} className={cn("mx-auto hidden h-9 w-auto object-contain", collapsed && "lg:block")} />
+          <div className={cn("mt-2 leading-tight", collapsed && "lg:hidden")}>
+            <div className="text-[14px] font-semibold text-sidebar-active-fg">{BRAND.appName}</div>
             <div className="text-[12px] text-sidebar-muted">{BRAND.appSubtitle}</div>
           </div>
         </div>
@@ -75,12 +73,11 @@ export function Sidebar({ groups }: { groups: NavGroup[] }) {
                         aria-current={active ? "page" : undefined}
                         className={cn(
                           "mx-2 flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[14px]",
-                          active ? "bg-white/12 text-white font-medium" : "text-sidebar-fg hover:bg-white/6 hover:text-white",
+                          active ? "bg-sidebar-active text-sidebar-active-fg font-semibold" : "text-sidebar-fg hover:bg-surface-muted",
                           collapsed && "lg:justify-center lg:px-0",
                         )}
-                        style={active ? { backgroundColor: "rgb(255 255 255 / 0.12)" } : undefined}
                       >
-                        <Icon aria-hidden className="h-4 w-4 shrink-0 opacity-90" />
+                        <Icon aria-hidden className={cn("h-4 w-4 shrink-0", active ? "text-primary" : "text-sidebar-muted")} />
                         <span className={cn("truncate", collapsed && "lg:sr-only")}>{item.label}</span>
                       </Link>
                     </li>
@@ -93,7 +90,7 @@ export function Sidebar({ groups }: { groups: NavGroup[] }) {
         <button
           type="button"
           onClick={toggle}
-          className="hidden lg:flex items-center gap-2 border-t border-white/10 px-4 h-11 text-[13px] text-sidebar-muted hover:text-white"
+          className="hidden lg:flex items-center gap-2 border-t border-line px-4 h-11 text-[13px] text-sidebar-muted hover:text-ink"
           aria-label={collapsed ? "Zijbalk uitklappen" : "Zijbalk inklappen"}
           aria-expanded={!collapsed}
         >

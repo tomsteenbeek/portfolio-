@@ -1,35 +1,48 @@
 # Design system
 
-## Huisstijlonderzoek en bronnen
+## Huisstijl: bron en werkwijze
 
-Gevraagd was de officiële huisstijl van https://gemeente.bodegraven-reeuwijk.nl/ te analyseren. **Vanuit de
-ontwikkelomgeving was de website niet bereikbaar** (uitgaand netwerkverkeer naar dit domein werd door het netwerkbeleid
-van de omgeving geweigerd). Er waren geen huisstijlbestanden in de projectdirectory.
+**Bron:** het officiële presentatiesjabloon van de gemeente (`Huisstijl_.pdf`, aangeleverd door de opdrachtgever op
+25-11-2026). De gemeentelijke website was vanuit de ontwikkelomgeving niet bereikbaar.
 
-Daarom zijn **geen officiële kleurcodes, lettertypen of logo's overgenomen of verzonnen**. Alle merkwaarden zijn
-**neutrale aannames**, centraal configureerbaar:
+Het sjabloon bevat het logo en de kenmerkende golfvormen, maar geen kleurcodes, lettertypen of gebruiksregels. De
+beelden in de PDF zijn rasterafbeeldingen met een transparantiemasker. De kleuren zijn daarom **gemeten op de weergave
+van het sjabloon** (render op 300 dpi, mediaan per tint):
 
-| Wat | Waar | Aanname |
+| Kleur | Waarde | Gebruik in de applicatie |
 |---|---|---|
-| Kleuren | `src/app/globals.css` (`:root`, blok *Merk*) | Rustig donker petrol als primaire kleur, leisteen als secundair, terracotta als spaarzaam accent |
-| Typografie | `--font-sans` in `globals.css` | Systeemlettertype-stack met *Segoe UI* (standaard op gemeentelijke Windows-werkplekken); geen externe webfonts |
-| Logo | `NEXT_PUBLIC_BRAND_LOGO` + `src/config/brand.ts` | Tekstlogo "DI" totdat Communicatie een goedgekeurd logobestand aanlevert |
-| Teksten | `src/config/brand.ts` | Applicatienaam, organisatienaam |
+| Blauw (woordmerk) | `#3e7ab4` | Logo, merkaccenten, prioriteit P2, volwassenheid 4. Contrast op wit 4,5:1 |
+| Groen | `#52b67a` | Alleen decoratief (merklijn); te licht voor tekst |
+| Geel | `#dee271` | Alleen decoratief; basis voor het lichtgele markeringsvlak |
+| Lichtgroen | `#94c24d` | Alleen decoratief |
+| Lichtblauw | `#399fd5` | Alleen decoratief |
 
-**Actie voor de opdrachtgever:** vraag bij Communicatie de huisstijlhandleiding (kleurcodes, lettertype, logo-bestanden en
-gebruiksregels) op en vervang de waarden in het blok *Merk*. Componenten hoeven daarvoor niet te worden aangepast.
-Controleer na vervanging het contrast (WCAG AA, 4,5:1 voor tekst).
+Voor bedieningselementen en tekst worden **AA-veilige tinten uit dezelfde kleurfamilies** gebruikt: primair
+`#2f6aa3` (5,7:1), donkerblauw `#1c4a7a`, donkergroen `#1f6b40` (6,5:1). Het merkblauw zelf haalt op lichte vlakken
+(actieve tab, actief menu-item) geen 4,5:1, vandaar deze afleiding.
+
+| Element | Bestand | Herkomst |
+|---|---|---|
+| Logo (beeldmerk + woordmerk) | `public/brand/logo.png` | Uitgesneden uit het sjabloon (raster, 900 px breed) |
+| Beeldmerk (ingeklapte zijbalk) | `public/brand/logo-mark.png` | Uitsnede van het logo |
+| Golfvormen | `public/brand/waves.jpg` | Achtergrond van het sjabloon, zonder logo (inlogscherm) |
+
+**Nog te verifiëren bij Communicatie:** officiële kleurcodes (de gemeten waarden kunnen enkele tinten afwijken), het
+lettertype van het woordmerk (voorlopig systeemlettertype *Segoe UI*), vectorversies van het logo (SVG/EPS) en de
+gebruiksregels (vrije ruimte, minimale grootte, gebruik op gekleurde achtergronden). Vervang dan de bestanden in
+`public/brand/` (zelfde namen) en de waarden in het blok *Merkpalet* in `src/app/globals.css`.
 
 ## Tokens
 
 | Groep | Tokens |
 |---|---|
-| Merk | `--brand-primary`, `--brand-primary-hover`, `--brand-primary-soft`, `--brand-secondary`, `--brand-accent`, `--brand-accent-soft` |
+| Merkpalet | `--brand-blue`, `--brand-green`, `--brand-yellow`, `--brand-lime`, `--brand-sky` (gemeten in sjabloon) |
+| Toepassing | `--brand-primary` (+ `-hover`, `-soft`), `--brand-secondary`, `--brand-accent` (+ `-soft`, `-ring`) voor markering verplicht/urgent |
 | Achtergrond | `--bg`, `--surface`, `--surface-muted`, `--sidebar-bg` |
 | Tekst | `--text`, `--text-muted` (≥ 4,5:1 op wit), `--text-subtle` |
 | Randen | `--border`, `--border-strong` |
 | Status | `--status-{green,amber,red,blue,gray}` + `-bg`; tekstkleuren getoetst op AA |
-| Prioriteit | `--p1` … `--p4`: één tint, donker → licht (ordinale schaal); label P1–P4 altijd zichtbaar |
+| Prioriteit | `--p1` … `--p4`: merkblauw, donker → licht (ordinale schaal); label P1–P4 altijd zichtbaar |
 | Grafiek | `--chart-1`, `--chart-2` (gevalideerd op kleurenblindheid en contrast), `--chart-grid` |
 | Typografie | `--font-sans`, `--font-heading`, `--font-mono`; cijfers met `tabular-nums` (`.num`) |
 | Vorm | `--radius-sm` 4px, `--radius` 6px, `--radius-lg` 10px, `--shadow-card` |
@@ -40,7 +53,7 @@ Tokens worden via `@theme inline` als Tailwind-klassen beschikbaar (`bg-primary`
 
 ## Vormgevingsprincipes
 
-- Zakelijk en rustig: veel wit, één primaire kleur, accentkleur alleen voor markeringen (verplicht/urgent).
+- Zakelijk en rustig: veel wit, merkblauw als primaire kleur, lichte zijbalk met logo. De golfkleuren alleen decoratief (merklijn bovenaan, inlogscherm); het gele vlak alleen voor markeringen (verplicht/urgent).
 - Informatiehiërarchie: paginatitel 26px semibold, kaarttitels 15px, labels in kleine kapitalen voor kerncijfers.
 - Statuskleuren altijd met tekst; nooit kleur als enige drager van betekenis.
 - Onbekende waarden in gedempte tekst ("Onbekend", "Nog niet beoordeeld"), nooit 0.

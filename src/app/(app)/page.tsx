@@ -47,7 +47,7 @@ export default async function DashboardPage() {
         <Stat label="Projecten hoog risico" value={kpis.high_risk_projects} tone={kpis.high_risk_projects ? "bad" : undefined} href="/risicos" />
         <Stat label="Openstaande besluiten" value={kpis.open_decisions} tone={kpis.open_decisions ? "warn" : undefined} href="/besluiten" />
         <Stat label={`Benodigde capaciteit ${year}`} value={fmtHours(kpis.required_hours, "Nog niet geraamd")} unknown={kpis.required_hours === null}
-              sub={`Raming bij ${kpis.topics_with_hours} onderwerpen, ${kpis.recurring_with_hours}/${kpis.recurring_total} werkzaamheden`} href="/capaciteit" />
+              sub={`Projecten, onderwerpen (${kpis.topics_with_hours} geraamd) en regulier (${kpis.recurring_with_hours}/${kpis.recurring_total} geraamd)`} href="/capaciteit" />
         <Stat label={`Beschikbare capaciteit ${year}`} value={fmtHours(kpis.available_hours, "Nog niet vastgesteld")} unknown={kpis.available_hours === null} href="/capaciteit" />
         <Stat label="Capaciteitstekort" value={shortage === null ? "Onbekend" : fmtHours(shortage)} unknown={shortage === null}
               tone={shortage !== null && shortage > 0 ? "bad" : shortage !== null ? "ok" : undefined}

@@ -56,7 +56,7 @@ Playwright-testsuite in CI, opschoontaken bewaartermijnen.
 
 ## Openstaande keuzes voor de opdrachtgever
 
-1. Officiële huisstijl (kleuren, lettertype, logo) aanleveren via Communicatie.
+1. Huisstijl verifiëren bij Communicatie: officiële kleurcodes, lettertype, vectorlogo en gebruiksregels (nu afgeleid uit het presentatiesjabloon).
 2. Hostingomgeving en toetsing (CISO/FG) vóór gebruik met echte gegevens.
 3. Bevestigen of de 122 onderwerpen (i.p.v. 120) correct zijn.
 4. Excel met oorspronkelijke medewerkersinput importeren (Beheer → Import en export).
