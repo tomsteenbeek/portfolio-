@@ -7,18 +7,16 @@
 import { chromium } from "playwright";
 
 const BASE = (process.env.BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
-const PATHS = ["/", "/directie/", "/pijlers/", "/pijlers/detail/?nr=1", "/pijlers/detail/?nr=2&tab=volwassenheid", "/jaarplan/", "/roadmap/",
-  "/inventarisatie/", "/deepdive/", "/deepdive/pijler/?nr=1", "/programmas/", "/projecten/", "/prioritering/", "/prioritering/?tab=matrix",
-  "/kanban/", "/afhankelijkheden/", "/besluiten/", "/reguliere-werkzaamheden/", "/formatie/", "/capaciteit/", "/expertise/",
-  "/teamontwikkeling/", "/risicos/", "/wetgeving/", "/leveranciers/", "/kpis/", "/beheer/rollen/", "/beheer/prioriteringsmodel/",
-  "/beheer/import-export/", "/zoeken/?q=data"];
-const ROLES = ["teamleider@voorbeeld.test", "medewerker.data@voorbeeld.test", "directie@voorbeeld.test", "projectleider@voorbeeld.test", "beheerder@voorbeeld.test"];
+const PATHS = ["/", "/pijlers/detail/?nr=1", "/pijlers/detail/?nr=4", "/onderwerpen/", "/onderwerpen/nieuw/", "/kpis/", "/projecten/",
+  "/prioritering/", "/prioritering/?tab=deelnemers", "/prioritering/?tab=model", "/prioritering/?tab=matrix", "/jaarplan/", "/roadmap/", "/zoeken/?q=data"];
+// Geen rollen meer: standaard "Team Digitale Informatie"; daarnaast één deelnemer (zoals bij beoordelen in een sessie).
+const ROLES = ["team@voorbeeld.test", "medewerker.data@voorbeeld.test"];
 
 const browser = await chromium.launch();
 let failures = 0;
 for (const email of ROLES) {
   const ctx = await browser.newContext();
-  await ctx.addInitScript((e) => { try { localStorage.setItem("di.demo.user", e); } catch {} }, email);
+  await ctx.addInitScript((e) => { try { sessionStorage.setItem("di.demo.user", e); } catch {} }, email);
   const page = await ctx.newPage();
   page.on("pageerror", (e) => { failures++; console.error(`[${email}] pageerror ${page.url()}: ${e.message}`); });
   for (const p of PATHS) {

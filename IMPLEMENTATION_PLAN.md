@@ -5,7 +5,15 @@
 - **`main`**: statische site op GitHub Pages + Supabase, demo zonder login (wens opdrachtgever, november 2026).
 - **`server-versie`**: Next.js-server met Entra ID-voorbereiding en Docker; basis voor gemeentelijke productie.
 
-## Fasering en status
+## Vereenvoudiging (november 2026)
+
+Op verzoek van de opdrachtgever is `main` teruggebracht tot: dashboard per pijler, onderwerpen als werk in uitvoering
+(geen status of volwassenheid; velden omschrijving, wat valt eronder, doel, aandachtspunten; één eigenaar als vrije tekst),
+KPI's (koppelbaar aan pijler en onderwerp), projecten/initiatieven (link naar Planner, trekker, status, einddatum),
+Prioritering, Jaarplan en Roadmap. Geen rollen. Overige modules (deepdive, besluiten, risico's, formatie, capaciteit,
+kanban, beheer, import) staan nog op de branch `server-versie`; de databasetabellen bestaan nog.
+
+## Fasering en status (oorspronkelijk)
 
 ### Fase 1 – Fundament ✅
 - Analyse: lege projectdirectory; geen bestaande architectuur of huisstijlbestanden.

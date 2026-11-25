@@ -19,25 +19,20 @@ export default function SearchPage() {
   const hits = term.length < 2 ? [] : await db((x) => x.query<Hit>(
     `with q as (select '%' || replace(replace(lower($1), '%', '\\%'), '_', '\\_') || '%' as p)
      select * from (
-       select 'Onderwerp' as kind, t.id, t.code || ' ' || t.title as label, t.description as sub, t.status, '/onderwerpen/detail?id=' || t.id as href from topics t, q
-        where t.archived_at is null and (lower(t.code || ' ' || t.title || ' ' || coalesce(t.description,'') || ' ' || coalesce(t.remarks,'')) like q.p)
-       union all select 'Project', j.id, j.number || ' ' || j.name, j.objective, j.status, '/projecten/detail?id=' || j.id from projects j, q
-        where j.archived_at is null and lower(j.number || ' ' || j.name || ' ' || coalesce(j.objective,'')) like q.p
-       union all select 'Programma', g.id, g.name, g.description, g.status, '/programmas/detail?id=' || g.id from programs g, q where lower(g.code || ' ' || g.name) like q.p
-       union all select 'Pijler', p.id, 'Pijler ' || p.number || ' – ' || p.title, p.objective, null, '/pijlers/detail?nr=' || p.number from pillars p, q where lower(p.title || ' ' || p.objective) like q.p
-       union all select 'Risico', r.id, r.number || ' ' || r.title, r.description, r.stage, '/risicos/detail?id=' || r.id from risks r, q where r.archived_at is null and lower(r.number || ' ' || r.title || ' ' || coalesce(r.description,'')) like q.p
-       union all select 'Besluit', d.id, d.number || ' ' || d.subject, d.decision_text, d.outcome, '/besluiten/detail?id=' || d.id from decisions d, q where d.archived_at is null and lower(d.number || ' ' || d.subject) like q.p
-       union all select 'KPI', k.id, k.name, k.description, null, '/kpis/detail?id=' || k.id from kpis k, q where k.archived_at is null and lower(k.name) like q.p
-       union all select 'Werkzaamheid', a.id, a.name, a.description, null, '/reguliere-werkzaamheden/detail?id=' || a.id from recurring_activities a, q where a.archived_at is null and lower(a.name) like q.p
-       union all select 'Leverancier', s.id, s.name, s.services, null, '/leveranciers/detail?id=' || s.id from suppliers s, q where s.archived_at is null and lower(s.name || ' ' || coalesce(s.services,'')) like q.p
-       union all select 'Regelgeving', w.id, w.name, w.description, w.status, '/wetgeving/detail?id=' || w.id from regulatory_requirements w, q where lower(w.name || ' ' || coalesce(w.description,'')) like q.p
+       select 'Pijler' as kind, p.id, 'Pijler ' || p.number || ' – ' || p.title as label, p.objective as sub, null::text as status, '/pijlers/detail?nr=' || p.number as href from pillars p, q
+        where lower(p.title || ' ' || p.objective || ' ' || coalesce(p.description,'')) like q.p
+       union all select 'Onderwerp', t.id, t.code || ' ' || t.title, coalesce(t.description, t.scope), null, '/onderwerpen/detail?id=' || t.id from topics t, q
+        where t.archived_at is null and lower(t.code || ' ' || t.title || ' ' || coalesce(t.description,'') || ' ' || coalesce(t.scope,'') || ' ' || coalesce(t.remarks,'') || ' ' || coalesce(t.owner_name,'')) like q.p
+       union all select 'KPI', k.id, k.name, k.description, null, '/kpis/detail?id=' || k.id from kpis k, q where k.archived_at is null and lower(k.name || ' ' || coalesce(k.description,'')) like q.p
+       union all select 'Project / initiatief', j.id, j.name, j.description, j.status, '/projecten/detail?id=' || j.id from projects j, q
+        where j.archived_at is null and lower(j.name || ' ' || coalesce(j.description,'') || ' ' || coalesce(j.lead_name,'')) like q.p
      ) x limit 100`, [term]));
   return (
     <>
       <PageHeader title={term ? `Zoekresultaten voor “${term}”` : "Zoeken"} crumbs={[{ label: "Zoeken" }]} />
       <GetForm path="/zoeken" role="search" className="mb-4 flex max-w-xl gap-2">
         <label htmlFor="q2" className="sr-only">Zoekterm</label>
-        <input id="q2" name="q" defaultValue={term} className="h-10 flex-1 rounded-md border border-line-strong bg-surface px-3" placeholder="Zoek in onderwerpen, projecten, risico's, besluiten…" />
+        <input id="q2" name="q" defaultValue={term} className="h-10 flex-1 rounded-md border border-line-strong bg-surface px-3" placeholder="Zoek in pijlers, onderwerpen, KPI's en projecten…" />
         <button className="h-10 rounded-md bg-primary px-4 text-sm text-white">Zoeken</button>
       </GetForm>
       <Card>

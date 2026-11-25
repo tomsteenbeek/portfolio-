@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardBody } from "@/components/ui/card";
 import { TabLinks } from "@/components/ui/tabs";
 import { StatusBadge, Badge } from "@/components/ui/badge";
+import { AssessAs } from "@/components/priority/participants";
 import { AssessPanel, ConsensusPanel, PresentLink, StatusControl } from "@/components/priority/session-client";
 import { Results, medianScores } from "@/components/priority/results";
 import { SessionForm } from "@/components/priority/session-form";
@@ -51,7 +52,7 @@ export default function SessionPage() {
         { key: "consensus", label: "Consensus en vaststelling" }, ...(canManage ? [{ key: "instellingen", label: "Instellingen" }] : []),
       ]} />
       <Card><CardBody>
-        {tab === "beoordelen" && <AssessPanel data={data} userId={user.id} isMember={isMember} />}
+        {tab === "beoordelen" && <><AssessAs members={data.members} /><AssessPanel data={data} userId={user.id} isMember={isMember} /></>}
         {tab === "resultaten" && <Results data={data} visible={visible} />}
         {tab === "consensus" && (visible ? <ConsensusPanel data={data} canConsensus={canManage} canFinalize={can(user.roles, "priority.finalize")} medians={medianScores(data)} />
           : <p className="text-sm text-muted">Consensus volgt na het sluiten van de individuele beoordelingsronde (status &apos;Bespreking&apos;).</p>)}

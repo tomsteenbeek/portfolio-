@@ -4,13 +4,12 @@ import { Topbar } from "@/components/layout/topbar";
 import { BrandBar } from "@/components/layout/brand-bar";
 import { UserGate } from "@/components/layout/user-gate";
 import { NAVIGATION } from "@/config/navigation";
-import { can } from "@/lib/auth/permissions";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <UserGate>
       {(user) => {
-        const groups = NAVIGATION.map((g) => ({ ...g, items: g.items.filter((i) => !i.perm || can(user.roles, i.perm)) })).filter((g) => g.items.length);
+        const groups = NAVIGATION;
         return (
           <div className="flex min-h-screen">
             <a href="#inhoud" className="skip-link">Direct naar de inhoud</a>

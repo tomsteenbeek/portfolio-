@@ -1,61 +1,24 @@
 "use client";
-import { AsyncPage, spObject } from "@/components/async-page";
-import Link from "next/link";
-import { ExportButtons } from "@/components/common/export-buttons";
+import { AsyncPage } from "@/components/async-page";
 import { db } from "@/lib/auth/current-user";
-import { can } from "@/lib/auth/permissions";
 import { listProjects } from "@/server/queries/projects";
 import { lookups } from "@/server/queries/topics";
 import { PageHeader } from "@/components/ui/page-header";
-import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { ProjectForm } from "@/components/projects/project-form";
-import { EmptyState } from "@/components/ui/empty-state";
-import { PriorityBadge, Rag, StatusBadge, Badge } from "@/components/ui/badge";
-import { LinkButton } from "@/components/ui/button";
-import { fmtDate, fmtPct } from "@/lib/format";
-import { RAG_DIMENSIONS } from "@/lib/domain";
+import { ProjectList } from "@/components/projects/project-list";
+import { ExportButtons } from "@/components/common/export-buttons";
 
 export default function ProjectsPage() {
-  return <AsyncPage render={async (__sp) => {
-    const searchParams = Promise.resolve(spObject(__sp));
-
-  const sp = await searchParams;
-  const d = await db(async (x, user) => ({ rows: await listProjects(x), lk: await lookups(x), user }));
-  const rows = sp.status ? d.rows.filter((r) => r.status === sp.status) : d.rows;
-  return (
-    <>
-      <PageHeader title="Projecten" crumbs={[{ label: "Portfolio" }, { label: "Projecten" }]}
-        description="Concrete veranderinitiatieven met één primaire pijler. Projecten ontstaan bij voorkeur uit gevalideerde en geprioriteerde onderwerpen."
-        actions={<>
-          <LinkButton href="/kanban">Kanbanbord</LinkButton>
-          <ExportButtons report="portfolio" />
-          {can(d.user.roles, "projects.create") && <Dialog trigger="Nieuw project" triggerVariant="primary" title="Nieuw project" wide><ProjectForm lookups={d.lk} compact /></Dialog>}
-        </>} />
-      <Card>
-        {rows.length === 0 ? <EmptyState title="Nog geen projecten" description="Zet gevalideerde onderwerpen om naar een project via de deepdive of de inventarisatie, of maak direct een project aan." /> : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[13px]"><caption className="sr-only">Projectportfolio</caption>
-              <thead className="bg-surface-muted text-left text-[12px] text-muted"><tr>{["Nr.", "Project", "Pijler", "Programma", "Projectleider", "Prioriteit", "Status", "Periode", "Voortgang", "Stoplichten"].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr></thead>
-              <tbody>{rows.map((r) => (
-                <tr key={r.id} className="border-t border-line align-top">
-                  <td className="num px-3 py-2 text-muted">{r.number}</td>
-                  <td className="px-3 py-2"><Link className="font-medium hover:text-primary hover:underline" href={`/projecten/detail?id=${r.id}`}>{r.name}</Link>{r.blocked_by.length > 0 && <div className="text-[12px] text-warn">Wacht op {r.blocked_by.join(", ")}</div>}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">Pijler {r.pillar_number}</td>
-                  <td className="px-3 py-2">{r.program_name ?? "—"}</td>
-                  <td className="px-3 py-2">{r.leader_name ?? <span className="text-subtle">—</span>}</td>
-                  <td className="px-3 py-2"><PriorityBadge category={r.priority_category} /></td>
-                  <td className="px-3 py-2"><StatusBadge status={r.status} />{r.planning_status === "Vastgesteld" && <Badge tone="primary" className="ml-1">Vastgesteld</Badge>}</td>
-                  <td className="num px-3 py-2 whitespace-nowrap">{fmtDate(r.start_date)} – {fmtDate(r.end_date)}</td>
-                  <td className="num px-3 py-2">{fmtPct(r.progress_pct, "—")}</td>
-                  <td className="px-3 py-2"><div className="grid grid-cols-3 gap-x-2 gap-y-0.5">{RAG_DIMENSIONS.map((g) => <Rag key={g.key} label={g.label} value={r[g.key as keyof typeof r] as string | null} />)}</div></td>
-                </tr>))}</tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-    </>
-  );
-
+  return <AsyncPage render={async () => {
+    const d = await db(async (x) => ({ rows: await listProjects(x), lk: await lookups(x) }));
+    return (
+      <>
+        <PageHeader title="Projecten & initiatieven" crumbs={[{ label: "Overzicht" }, { label: "Projecten & initiatieven" }]}
+          description="Lopende projecten en initiatieven, gekoppeld aan pijlers en onderwerpen. Het werk zelf wordt bijgehouden in Planner."
+          actions={<><ExportButtons report="portfolio" /><Dialog trigger="Nieuw project / initiatief" triggerVariant="primary" title="Nieuw project of initiatief" wide><ProjectForm lookups={d.lk} /></Dialog></>} />
+        <ProjectList rows={d.rows} pillars={d.lk.pillars} />
+      </>
+    );
   }} />;
 }

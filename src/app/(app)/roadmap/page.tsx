@@ -22,8 +22,7 @@ export default function RoadmapPage() {
          from projects j join pillars p on p.id = j.primary_pillar_id left join programs g on g.id = j.program_id left join users u on u.id = j.project_leader_id
         where j.archived_at is null and j.status <> 'Geannuleerd' order by p.number, j.start_date nulls last`);
     const deadlines = await x.query<Deadline>(
-      `select t.code || ' ' || t.title as label, t.legal_deadline::text as date, '/onderwerpen/detail?id=' || t.id as href from topics t where t.legal_deadline is not null and t.archived_at is null
-       union all select r.name, r.deadline::text, '/wetgeving/detail?id=' || r.id from regulatory_requirements r where r.deadline is not null`);
+      `select t.code || ' ' || t.title as label, t.legal_deadline::text as date, '/onderwerpen/detail?id=' || t.id as href from topics t where t.legal_deadline is not null and t.archived_at is null`);
     const pillars = await x.query<{ number: number; title: string }>(`select number, title from pillars order by number`);
     const disciplines = (await x.query<{ name: string }>(`select name from disciplines order by sort_order`)).map((r) => r.name);
     return { period, projects, deadlines, pillars, disciplines };

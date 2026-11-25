@@ -115,9 +115,9 @@ export async function exportReport(report: ReportKey, format: ExportFormat, year
 }
 
 const TOPIC_LABELS: Record<string, string> = {
-  code: "ID", title: "Titel", pillar: "Pijler", subcategory: "Subcategorie", program_name: "Programma", description: "Omschrijving",
+  code: "ID", title: "Titel", pillar: "Pijler", subcategory: "Subcategorie", program_name: "Programma", description: "Omschrijving", scope: "Wat valt eronder",
   reason: "Aanleiding", current_situation: "Huidige situatie", desired_situation: "Gewenste situatie", problem_statement: "Probleemstelling",
-  intended_result: "Beoogd resultaat", sources: "Bron", classifications: "Type werkzaamheden", owner_name: "Verantwoordelijke",
+  intended_result: "Beoogd resultaat", sources: "Bron", classifications: "Type werkzaamheden", owner_name: "Eigenaar",
   disciplines: "Betrokken disciplines", strategic_contribution: "Strategische bijdrage", legal_basis: "Wettelijke grondslag",
   legal_deadline: "Wettelijke deadline", risk_if_not_done: "Risico bij niet uitvoeren", service_impact: "Impact op dienstverlening",
   dependencies_text: "Afhankelijkheden", maturity_current: "Volwassenheid (huidig)", maturity_target: "Volwassenheid (gewenst)",
@@ -135,7 +135,7 @@ export async function exportTopics(idList: string[], colList: string[], format: 
   if (cols.includes("priority_category")) cols.splice(cols.indexOf("priority_category") + 1, 0, "priority_score");
   const rows = await withUser(user.id, (db) => listTopics(db, { includeArchived: true }));
   const data = rows.filter((r) => ids.size === 0 || ids.has(r.id)).map((r) => ({ ...r, pillar: `${r.pillar_number}. ${r.pillar_title}` }));
-  return respond(format, "inventarisatie", "Totale inventarisatie onderwerpen", [
+  return respond(format, "onderwerpen", "Onderwerpen", [
     { name: "Onderwerpen", columns: cols.map((k) => ({ key: k, label: TOPIC_LABELS[k], width: ["title", "description"].includes(k) ? 50 : undefined })), rows: data },
   ]);
 }

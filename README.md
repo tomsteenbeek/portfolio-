@@ -13,8 +13,12 @@ Digitale Informatie (gemeente Bodegraven-Reeuwijk).
 | **GitHub Pages** | Toont het dashboard (statische pagina's) op `https://<gebruikersnaam>.github.io/<repository>/` |
 | **Supabase** | PostgreSQL-database; de browser leest en schrijft via twee beveiligde databasefuncties |
 
-Er is **geen login**: je werkt standaard als *Robin Teamleider (fictief)* en kunt rechtsboven van demorol wisselen om
-het dashboard per rol te bekijken.
+**Wat erin zit:** de 7 strategische pijlers met per pijler de onderwerpen (werk in uitvoering, met één eigenaar),
+KPI's, en projecten/initiatieven die in Planner worden bijgehouden maar hier aan pijlers en onderwerpen worden gekoppeld.
+Daarnaast Prioritering (gezamenlijk scoren in werksessies), Jaarplan en Roadmap.
+
+Er is **geen login en geen rollen**: iedereen werkt als *Team Digitale Informatie*. Alleen in een prioriteringssessie
+kies je bij *Beoordelen als* welke deelnemer aan de beurt is.
 
 > ⚠️ **Alleen voor demo en eigen gebruik met fictieve of niet-gevoelige gegevens.** Zonder login kan iedereen met de
 > link gegevens bekijken en wijzigen. Zie [SECURITY.md](SECURITY.md). De volledige serverversie (met Entra ID-voorbereiding,
@@ -51,10 +55,12 @@ De eerste keer richt de workflow de database in: tabellen, rechtenregels, de 7 p
 demogebruikers. Bij volgende publicaties wordt de database alleen bijgewerkt; jouw gegevens blijven behouden.
 
 ## Dagelijks gebruik
-- Open de link, klik door het dashboard en pas gegevens aan; alles wordt direct opgeslagen in Supabase.
-- **Rol wisselen** (demo): keuzelijst rechtsboven.
+- Open de link: het dashboard toont de pijlers; klik door naar een pijler, onderwerp, KPI of project en pas aan.
+  Alles wordt direct opgeslagen in Supabase.
+- **Eigenaar** van een onderwerp: klik in *Onderwerpen* op de eigenaar, of selecteer meerdere onderwerpen → *Eigenaar instellen*.
+- **Projecten & initiatieven**: plak de link van het Planner-bord; koppel pijlers en onderwerpen.
+- **Prioritering**: voeg op het tabblad *Deelnemers* namen toe; in een sessie kies je *Beoordelen als*.
 - **Exports** (Excel, CSV, JSON, Print/PDF) worden in je browser gemaakt.
-- **Import** (Excel/CSV/JSON) via *Beheer → Import en export*, met voorbeeld en bevestiging.
 - **Back-up**: Supabase maakt dagelijks back-ups (gratis plan: beperkte bewaartijd). Extra zekerheid: exports, of
   `pg_dump` met de connection string.
 - **Gratis Supabase pauzeert** na een week zonder gebruik. Het dashboard meldt dan dat de database niet bereikbaar is;

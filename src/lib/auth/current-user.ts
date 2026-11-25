@@ -1,6 +1,6 @@
 /**
- * Demomodus zonder login: de gebruiker wordt gekozen in de bovenbalk
- * (standaard de teamleider) en in de browser onthouden.
+ * Werkomgeving zonder login: standaard werk je als "Team Digitale Informatie"
+ * (alle rechten). Alleen bij prioriteringssessies kies je wie er beoordeelt.
  */
 import { dbFor, demoUsers, type Db, type DemoUser } from "@/lib/db";
 import { can, type Permission } from "./permissions";
@@ -15,7 +15,7 @@ export type CurrentUser = {
 };
 
 const KEY = "di.demo.user";
-export const DEFAULT_DEMO_EMAIL = "teamleider@voorbeeld.test";
+export const DEFAULT_DEMO_EMAIL = "team@voorbeeld.test";
 
 let current: CurrentUser | null = null;
 let cachedUsers: DemoUser[] | null = null;
@@ -34,14 +34,16 @@ export async function loadCurrentUser(): Promise<CurrentUser> {
   const users = await listDemoUsers();
   if (!users.length) throw new Error("Er zijn geen demogebruikers gevonden. Is de database ingericht (migraties en seed)?");
   let email = DEFAULT_DEMO_EMAIL;
-  try { email = localStorage.getItem(KEY) ?? DEFAULT_DEMO_EMAIL; } catch {}
-  const u = users.find((x) => x.email === email) ?? users.find((x) => x.email === DEFAULT_DEMO_EMAIL) ?? users[0];
+  try { email = sessionStorage.getItem(KEY) ?? DEFAULT_DEMO_EMAIL; } catch {}
+  const u = users.find((x) => x.email === email) ?? users.find((x) => x.email === DEFAULT_DEMO_EMAIL)
+    ?? users.find((x) => x.roles.includes("teamleider")) ?? users[0];
   current = toUser(u);
   return current;
 }
 
-export function setDemoUser(email: string) {
-  try { localStorage.setItem(KEY, email); } catch {}
+/** Tijdelijk (dit tabblad) als een andere deelnemer werken, bv. om te beoordelen in een prioriteringssessie. */
+export function setDemoUser(email: string | null) {
+  try { if (email) sessionStorage.setItem(KEY, email); else sessionStorage.removeItem(KEY); } catch {}
 }
 
 export function getCurrentUser(): CurrentUser | null {
@@ -53,7 +55,7 @@ export async function requireUser(): Promise<CurrentUser> {
 }
 
 export class AuthorizationError extends Error {
-  constructor(message = "Deze demorol heeft geen rechten voor deze actie. Wissel rechtsboven van rol.") {
+  constructor(message = "Hiervoor zijn geen rechten. Werk je als deelnemer in een prioriteringssessie? Ga terug naar Team Digitale Informatie.") {
     super(message);
   }
 }

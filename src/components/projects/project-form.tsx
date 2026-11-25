@@ -1,58 +1,72 @@
 "use client";
+import { useMemo, useState } from "react";
 import { ActionForm, SubmitButton, fieldError } from "@/components/ui/action-form";
-import { Checkbox, Field, Input, Select, Textarea } from "@/components/ui/field";
-import { saveProject } from "@/server/actions/projects";
-import { PROJECT_STATUSES, RAG, RAG_DIMENSIONS } from "@/lib/domain";
+import { Checkbox, Field, Input, Select, Textarea, inputClass } from "@/components/ui/field";
+import { saveProject, SIMPLE_PROJECT_STATUSES } from "@/server/actions/projects";
 import type { Lookups } from "@/server/queries/topics";
+import type { ProjectRow } from "@/server/queries/projects";
 
-export function ProjectForm({ p, lookups, secondary, compact }: { p?: Record<string, unknown> | null; lookups: Lookups; secondary?: string[]; compact?: boolean }) {
-  const v = (k: string) => (p?.[k] === null || p?.[k] === undefined ? "" : String(p[k]));
-  const ta = (n: string, l: string) => <Field key={n} label={l} htmlFor={`pj-${n}`} className="md:col-span-2"><Textarea id={`pj-${n}`} name={n} defaultValue={v(n)} rows={2} /></Field>;
+/** Project/initiatief: het werk zelf staat in Planner; hier de koppeling aan pijlers en onderwerpen. */
+export function ProjectForm({ p, lookups, defaultTopic }: { p?: ProjectRow | null; lookups: Lookups; defaultTopic?: string }) {
+  const [filter, setFilter] = useState("");
+  const [primary, setPrimary] = useState(p?.primary_pillar_id ?? lookups.topics.find((t) => t.id === defaultTopic)?.pillar_id ?? "");
+  const chosen = useMemo(() => new Set([...(p?.topics.map((t) => t.id) ?? []), ...(defaultTopic ? [defaultTopic] : [])]), [p, defaultTopic]);
+  const [sel, setSel] = useState<Set<string>>(chosen);
+  const v = (k: keyof ProjectRow) => (p?.[k] ?? "") as string;
+  const statuses = p && !(SIMPLE_PROJECT_STATUSES as readonly string[]).includes(p.status) ? [p.status, ...SIMPLE_PROJECT_STATUSES] : SIMPLE_PROJECT_STATUSES;
+  const visibleTopics = lookups.topics.filter((t) => sel.has(t.id) || `${t.code} ${t.title}`.toLowerCase().includes(filter.toLowerCase()));
   return (
-    <ActionForm action={saveProject} success="Project opgeslagen" className="space-y-6">
-      {(state) => (<>
-        {p?.id ? <input type="hidden" name="id" value={String(p.id)} /> : null}
-        <fieldset className="grid gap-4 md:grid-cols-2">
-          <legend className="mb-1 text-sm font-semibold">Basis</legend>
-          <Field label="Projectnaam" htmlFor="pj-name" required error={fieldError(state, "name")} className="md:col-span-2"><Input id="pj-name" name="name" required defaultValue={v("name")} /></Field>
-          <Field label="Primaire pijler" htmlFor="pj-pillar" required hint="Eén primaire pijler voorkomt dubbeltellingen"><Select id="pj-pillar" name="primary_pillar_id" required defaultValue={v("primary_pillar_id")} placeholder="Kies…" options={lookups.pillars.map((x) => ({ value: x.id, label: `${x.number}. ${x.title}` }))} /></Field>
-          <Field label="Programma" htmlFor="pj-prog"><Select id="pj-prog" name="program_id" defaultValue={v("program_id")} placeholder="Geen" options={lookups.programs.map((x) => ({ value: x.id, label: x.name }))} /></Field>
-          <Field label="Status" htmlFor="pj-status" required><Select id="pj-status" name="status" defaultValue={v("status") || "Idee"} options={PROJECT_STATUSES} /></Field>
-          <Field label="Projectleider" htmlFor="pj-leader"><Select id="pj-leader" name="project_leader_id" defaultValue={v("project_leader_id")} placeholder="Nog niet bepaald" options={lookups.users.map((u) => ({ value: u.id, label: u.display_name }))} /></Field>
-          <Field label="Opdrachtgever" htmlFor="pj-sponsor"><Input id="pj-sponsor" name="sponsor" defaultValue={v("sponsor")} /></Field>
-          <Field label="Voortgang (%)" htmlFor="pj-prog-pct" error={fieldError(state, "progress_pct")}><Input id="pj-prog-pct" name="progress_pct" type="number" min={0} max={100} defaultValue={v("progress_pct")} /></Field>
-        </fieldset>
-        {!compact && (
+    <ActionForm action={saveProject} success="Opgeslagen" className="space-y-5">
+      {(state) => (
+        <>
+          {p?.id && <input type="hidden" name="id" value={p.id} />}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Naam" htmlFor="pj-name" required error={fieldError(state, "name")} className="md:col-span-2"><Input id="pj-name" name="name" required defaultValue={v("name")} /></Field>
+            <Field label="Korte omschrijving" htmlFor="pj-desc" className="md:col-span-2"><Textarea id="pj-desc" name="description" rows={2} defaultValue={v("description")} /></Field>
+            <Field label="Link naar Planner" htmlFor="pj-url" hint="Kopieer de link van het Planner-bord of de taak" error={fieldError(state, "planner_url")} className="md:col-span-2">
+              <Input id="pj-url" name="planner_url" type="url" placeholder="https://tasks.office.com/…" defaultValue={v("planner_url")} />
+            </Field>
+            <Field label="Trekker" htmlFor="pj-lead" hint="Naam, functie of team"><Input id="pj-lead" name="lead_name" maxLength={120} defaultValue={v("lead_name")} /></Field>
+            <Field label="Status" htmlFor="pj-status" required><Select id="pj-status" name="status" defaultValue={v("status") || "Gepland"} options={statuses} /></Field>
+            <Field label="Startdatum" htmlFor="pj-start" hint="Nodig om op de roadmap te verschijnen"><Input id="pj-start" name="start_date" type="date" defaultValue={v("start_date")} /></Field>
+            <Field label="Einddatum" htmlFor="pj-end" error={fieldError(state, "end_date")}><Input id="pj-end" name="end_date" type="date" defaultValue={v("end_date")} /></Field>
+            <Field label="Hoofdpijler" htmlFor="pj-pillar" required>
+              <Select id="pj-pillar" name="primary_pillar_id" required value={primary} onChange={(e) => setPrimary(e.target.value)} placeholder="Kies…"
+                options={lookups.pillars.map((x) => ({ value: x.id, label: `${x.number}. ${x.short_title ?? x.title}` }))} />
+            </Field>
+          </div>
           <fieldset>
-            <legend className="mb-1.5 text-sm font-semibold">Secundaire pijlers <span className="font-normal text-muted">(draagt ook bij aan)</span></legend>
-            <input type="hidden" name="secondary_pillars_present" value="1" />
-            <div className="grid gap-1.5 sm:grid-cols-2">{lookups.pillars.map((x) => <Checkbox key={x.id} name="secondary_pillars" value={x.id} label={`${x.number}. ${x.title}`} defaultChecked={secondary?.includes(x.id)} />)}</div>
+            <legend className="mb-1.5 text-sm font-semibold">Draagt ook bij aan pijler(s)</legend>
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5">
+              {lookups.pillars.filter((x) => x.id !== primary).map((x) => <Checkbox key={x.id} name="secondary_pillars" value={x.id} label={`${x.number}. ${x.short_title ?? x.title}`} defaultChecked={p?.secondary_pillars.includes(x.number)} />)}
+            </div>
           </fieldset>
-        )}
-        <fieldset className="grid gap-4 md:grid-cols-4">
-          <legend className="mb-1 text-sm font-semibold">Planning en middelen</legend>
-          <Field label="Startdatum" htmlFor="pj-start"><Input id="pj-start" type="date" name="start_date" defaultValue={v("start_date")} /></Field>
-          <Field label="Einddatum" htmlFor="pj-end" error={fieldError(state, "end_date")}><Input id="pj-end" type="date" name="end_date" defaultValue={v("end_date")} /></Field>
-          <Field label="Planningsstatus" htmlFor="pj-ps"><Select id="pj-ps" name="planning_status" defaultValue={v("planning_status") || "Gepland"} options={["Gepland", "Vastgesteld"]} /></Field>
-          <div />
-          <Field label="Budget (€)" htmlFor="pj-budget" error={fieldError(state, "budget")}><Input id="pj-budget" type="number" min={0} name="budget" defaultValue={v("budget")} /></Field>
-          <Field label="Gerealiseerde kosten (€)" htmlFor="pj-cost"><Input id="pj-cost" type="number" min={0} name="actual_cost" defaultValue={v("actual_cost")} /></Field>
-          <Field label="Benodigde uren" htmlFor="pj-hreq"><Input id="pj-hreq" type="number" min={0} name="hours_required" defaultValue={v("hours_required")} /></Field>
-          <Field label="Gerealiseerde uren" htmlFor="pj-hact"><Input id="pj-hact" type="number" min={0} name="hours_actual" defaultValue={v("hours_actual")} /></Field>
-        </fieldset>
-        {!compact && (<>
-          <fieldset className="grid gap-4 md:grid-cols-6">
-            <legend className="mb-1 text-sm font-semibold">Stoplichten</legend>
-            {RAG_DIMENSIONS.map((r) => <Field key={r.key} label={r.label} htmlFor={`pj-${r.key}`}><Select id={`pj-${r.key}`} name={r.key} defaultValue={v(r.key)} placeholder="Onbekend" options={RAG.map((x) => ({ value: x, label: x[0].toUpperCase() + x.slice(1) }))} /></Field>)}
+          <fieldset>
+            <legend className="mb-1.5 text-sm font-semibold">Gekoppelde onderwerpen <span className="font-normal text-muted">({sel.size} gekozen)</span></legend>
+            <label htmlFor="pj-tfilter" className="sr-only">Onderwerpen filteren</label>
+            <input id="pj-tfilter" className={`${inputClass} mb-2 h-8 max-w-xs text-[13px]`} placeholder="Filter op ID of titel" value={filter} onChange={(e) => setFilter(e.target.value)} />
+            <div className="max-h-64 overflow-y-auto rounded-md border border-line p-2">
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => {
+                const list = visibleTopics.filter((t) => t.pillar_number === n);
+                if (!list.length) return null;
+                return (
+                  <div key={n} className="mb-2">
+                    <div className="text-[12px] font-semibold uppercase text-muted">Pijler {n}</div>
+                    {list.map((t) => (
+                      <label key={t.id} className="flex items-start gap-2 py-0.5 text-sm">
+                        <input type="checkbox" name="topics" value={t.id} className="mt-1" checked={sel.has(t.id)}
+                          onChange={(e) => { const s = new Set(sel); if (e.target.checked) s.add(t.id); else s.delete(t.id); setSel(s); }} />
+                        <span><span className="num text-muted">{t.code}</span> {t.title}</span>
+                      </label>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
           </fieldset>
-          <fieldset className="grid gap-4 md:grid-cols-2">
-            <legend className="mb-1 text-sm font-semibold">Projectdefinitie</legend>
-            {ta("reason", "Aanleiding")}{ta("problem_statement", "Probleemstelling")}{ta("objective", "Doelstelling")}{ta("scope", "Scope")}
-            {ta("out_of_scope", "Buiten scope")}{ta("business_case", "Businesscase")}{ta("stakeholders", "Stakeholders")}{ta("steering_group", "Stuurgroep")}
-          </fieldset>
-        </>)}
-        <SubmitButton>{p?.id ? "Project opslaan" : "Project aanmaken"}</SubmitButton>
-      </>)}
+          <SubmitButton>{p?.id ? "Opslaan" : "Toevoegen"}</SubmitButton>
+        </>
+      )}
     </ActionForm>
   );
 }

@@ -284,6 +284,7 @@ export const ROLES = [
 
 /** Uitsluitend fictieve gebruikers voor de ontwikkelomgeving. */
 export const DEV_USERS = [
+  { email: "team@voorbeeld.test", name: "Team Digitale Informatie", discipline: "MGT", roles: ["admin", "teamleider"] },
   { email: "beheerder@voorbeeld.test", name: "Alex Beheer (fictief)", discipline: "ICT", roles: ["admin"] },
   { email: "teamleider@voorbeeld.test", name: "Robin Teamleider (fictief)", discipline: "MGT", roles: ["teamleider"] },
   { email: "medewerker.security@voorbeeld.test", name: "Sam Security (fictief)", discipline: "SEC", roles: ["medewerker"] },

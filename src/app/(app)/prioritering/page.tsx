@@ -2,7 +2,6 @@
 import { AsyncPage, spObject } from "@/components/async-page";
 import Link from "next/link";
 import { db } from "@/lib/auth/current-user";
-import { can } from "@/lib/auth/permissions";
 import { activeModel, listSessions, matrixData } from "@/server/queries/priority";
 import { getSettings } from "@/server/queries/dashboard";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,6 +12,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Dialog } from "@/components/ui/dialog";
 import { SessionForm } from "@/components/priority/session-form";
 import { RubricTable } from "@/components/priority/score-input";
+import { ModelForm } from "@/components/admin/forms";
+import { ParticipantsPanel } from "@/components/priority/participants";
 import { PriorityFeasibilityMatrix } from "@/components/priority/matrix";
 import { fmtDate } from "@/lib/format";
 
@@ -33,9 +34,12 @@ export default function PriorityPage() {
     users: await x.query<{ id: string; display_name: string }>(
       `select distinct u.id, u.display_name from users u join user_roles ur on ur.user_id = u.id join roles r on r.id = ur.role_id
         where u.is_active and r.code in ('medewerker','teamleider','projectleider') order by u.display_name`),
+    participants: await x.query<{ id: string; display_name: string; sessions: number }>(
+      `select u.id, u.display_name, (select count(*) from priority_session_members m where m.user_id = u.id)::int as sessions
+         from users u where u.is_active and u.is_fictitious and u.email <> 'team@voorbeeld.test' order by u.display_name`),
     projects: await x.query<{ id: string; number: string; name: string }>(`select id, number, name from projects where archived_at is null and status not in ('Afgerond','Geannuleerd') order by number`),
   }));
-  const canManage = can(d.user.roles, "priority.sessions");
+  const canManage = true;
   return (
     <>
       <PageHeader title="Gezamenlijke prioritering"
@@ -47,7 +51,7 @@ export default function PriorityPage() {
           </Dialog>
         ) : undefined}
       />
-      <TabLinks base="/prioritering" active={tab} tabs={[{ key: "sessies", label: "Sessies", count: d.sessions.length }, { key: "matrix", label: "Prioriteit vs haalbaarheid" }, { key: "model", label: `Model (versie ${d.model?.version ?? "?"})` }]} />
+      <TabLinks base="/prioritering" active={tab} tabs={[{ key: "sessies", label: "Sessies", count: d.sessions.length }, { key: "matrix", label: "Prioriteit vs haalbaarheid" }, { key: "deelnemers", label: "Deelnemers", count: d.participants.length }, { key: "model", label: `Model (versie ${d.model?.version ?? "?"})` }]} />
       {tab === "sessies" && (
         <Card>
           {d.sessions.length === 0 ? (
@@ -72,6 +76,7 @@ export default function PriorityPage() {
           )}
         </Card>
       )}
+      {tab === "deelnemers" && <Card><CardHeader title="Deelnemers" /><CardBody><ParticipantsPanel participants={d.participants} /></CardBody></Card>}
       {tab === "matrix" && (
         <Card><CardHeader title="Prioriteit versus haalbaarheid" description="Klik op een punt om het initiatief te openen. Verplichte/urgente initiatieven vallen nooit in 'uitstellen'." />
           <CardBody><PriorityFeasibilityMatrix points={d.matrix} pT={Number(d.settings["prioriteit.drempel_matrix"] ?? 60)} fT={Number(d.settings["haalbaarheid.drempel"] ?? 50)} /></CardBody></Card>
@@ -79,8 +84,11 @@ export default function PriorityPage() {
       {tab === "model" && d.model && (
         <Card><CardHeader title={`Gewogen prioriteringsmodel – versie ${d.model.version}`}
           description="PriorityScore = Σ (score / 5 × gewicht). P1 ≥ 80 · P2 60–<80 · P3 40–<60 · P4 < 40 (op de ongeronde score)."
-          actions={can(d.user.roles, "priority.model") ? <Link href="/beheer/prioriteringsmodel" className="text-[13px] text-primary hover:underline">Model beheren</Link> : undefined} />
-          <CardBody><RubricTable criteria={d.model.criteria} /></CardBody></Card>
+          />
+          <CardBody className="space-y-4"><RubricTable criteria={d.model.criteria} />
+            <details className="rounded-md border border-line p-3"><summary className="cursor-pointer text-sm font-medium text-primary">Gewichten en uitleg aanpassen (nieuwe modelversie)</summary>
+              <div className="mt-3"><ModelForm criteria={d.model.criteria} /></div></details>
+          </CardBody></Card>
       )}
     </>
   );

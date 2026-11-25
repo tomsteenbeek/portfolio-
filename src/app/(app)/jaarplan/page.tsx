@@ -74,7 +74,7 @@ export default function AnnualPlanPage() {
                 <thead className="text-left text-[12px] text-muted"><tr><th className="py-1">Initiatief</th><th>Type</th><th>Pijler</th><th>Prioriteit</th><th>Capaciteit</th>{d.fin && <th>Budget</th>}<th /></tr></thead>
                 <tbody>{d.items.map((i) => (
                   <tr key={i.id} className="border-t border-line">
-                    <td className="py-1.5"><Link className="hover:underline" href={i.kind === "Project" ? `/projecten/detail?id=${i.ref_id}` : i.kind === "Onderwerp" ? `/onderwerpen/detail?id=${i.ref_id}` : `/programmas/detail?id=${i.ref_id}`}>{i.label}</Link>{i.flags && <Badge tone="accent" className="ml-1">Verplicht</Badge>}{i.note && <div className="text-[12px] text-muted">{i.note}</div>}</td>
+                    <td className="py-1.5"><Link className="hover:underline" href={i.kind === "Project" ? `/projecten/detail?id=${i.ref_id}` : i.kind === "Onderwerp" ? `/onderwerpen/detail?id=${i.ref_id}` : "/jaarplan"}>{i.label}</Link>{i.flags && <Badge tone="accent" className="ml-1">Verplicht</Badge>}{i.note && <div className="text-[12px] text-muted">{i.note}</div>}</td>
                     <td>{i.kind}</td><td>{i.pillar ? `Pijler ${i.pillar}` : "—"}</td><td><PriorityBadge category={i.priority} /></td>
                     <td className="num">{fmtHours(i.hours, "Onbekend")}</td>{d.fin && <td className="num">{fmtEuro(i.budget, "Onbekend")}</td>}
                     <td className="text-right">{edit && <RemoveItem id={i.id} />}</td>
@@ -85,7 +85,7 @@ export default function AnnualPlanPage() {
           </CardBody></Card>
           <Card><CardHeader title="6. Reguliere werkzaamheden" /><CardBody className="space-y-2">
             {section("regulier")}
-            <p className="text-sm">Basispakket: {d.recurring?.n ?? 0} structurele werkzaamheden, {fmtHours(d.recurring?.hours ?? null, "uren nog niet geraamd")} per jaar (raming bij {d.recurring?.known ?? 0}). <Link className="text-primary hover:underline no-print" href="/reguliere-werkzaamheden">Details</Link></p>
+            <p className="text-sm">Basispakket: {d.recurring?.n ?? 0} structurele werkzaamheden, {fmtHours(d.recurring?.hours ?? null, "uren nog niet geraamd")} per jaar (raming bij {d.recurring?.known ?? 0}).</p>
           </CardBody></Card>
           <div className="grid gap-4 md:grid-cols-2">
             <Card><CardHeader title="7. Capaciteitsbehoefte" /><CardBody className="space-y-3">
@@ -111,12 +111,12 @@ export default function AnnualPlanPage() {
           </CardBody></Card>
           <Card><CardHeader title="10. Benodigde besluitvorming" /><CardBody className="space-y-2">
             {section("besluitvorming")}
-            <ul className="text-sm">{d.decisions.map((x) => <li key={x.id}><Link className="hover:underline" href={`/besluiten/detail?id=${x.id}`}>{x.number} {x.subject}</Link>{x.decision_body ? <span className="text-muted"> – {x.decision_body}</span> : null}</li>)}{!d.decisions.length && <li className="text-muted">Geen openstaande besluiten.</li>}</ul>
+            <ul className="text-sm">{d.decisions.map((x) => <li key={x.id}>{x.number} {x.subject}{x.decision_body ? <span className="text-muted"> – {x.decision_body}</span> : null}</li>)}{!d.decisions.length && <li className="text-muted">Geen openstaande besluiten.</li>}</ul>
           </CardBody></Card>
           <Card className="no-print"><CardHeader title="Versies" /><ul className="divide-y divide-line text-sm">
             {d.versions.map((v) => <li key={v.id} className="flex justify-between px-5 py-2"><Link className="hover:text-primary hover:underline" href={`/jaarplan/versie?id=${v.id}`}>Versie {v.version} – {v.status}{v.note ? `: ${v.note}` : ""}</Link><span className="text-muted">{fmtDateTime(v.created_at)} · {v.by_name}</span></li>)}
             {!d.versions.length && <li className="px-5 py-3 text-muted">Nog geen versies. Een versie wordt vastgelegd bij iedere statuswijziging of handmatig.</li>}</ul></Card>
-          <p className="text-[12px] text-subtle">Secties zonder tekst worden niet automatisch gevuld. Overzichten (pijlers, initiatieven, risico&apos;s, besluiten) zijn live samengesteld; een versie legt de stand vast.{ANNUAL_PLAN_SECTIONS.length ? "" : ""}</p>
+          <p className="text-[12px] text-subtle">Secties zonder tekst worden niet automatisch gevuld. Overzichten (pijlers, initiatieven, risico&apos;s, besluiten) zijn live samengesteld; een versie legt de stand vast.</p>
         </div>
       )}
     </>
