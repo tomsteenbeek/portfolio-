@@ -1,0 +1,49 @@
+{
+  "name": "di-strategie-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run tests/priority.test.ts tests/stats-feasibility-capacity.test.ts",
+    "test:integration": "vitest run tests/rls.integration.test.ts",
+    "test:db:setup": "APP_ENV=test tsx scripts/migrate.ts && APP_ENV=test tsx scripts/seed.ts",
+    "test:e2e": "node tests/e2e/smoke.mjs"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "exceljs": "^4.4.0",
+    "jose": "^6.2.18",
+    "lucide-react": "^1.79.0",
+    "next": "15.5.29",
+    "papaparse": "^5.7.1",
+    "pg": "^8.23.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "recharts": "^3.11.1",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.20.5",
+    "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.29",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.1.1"
+  }
+}

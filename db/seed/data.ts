@@ -1,0 +1,452 @@
+/**
+ * Initiële inhoud. Alleen gegevens uit de opdracht; geen fictieve
+ * eigenaren, budgetten, capaciteit, prioriteiten of voortgang.
+ */
+
+export type SeedPillar = {
+  number: number;
+  title: string;
+  shortTitle: string;
+  objective: string;
+  results: string[];
+  topics: string[];
+};
+
+export const PILLARS: SeedPillar[] = [
+  {
+    number: 1,
+    title: "Regie, organisatie en professionalisering",
+    shortTitle: "Regie & organisatie",
+    objective:
+      "Een professioneel georganiseerd team dat richting geeft aan de digitale ontwikkeling van de gemeente, grip heeft op financiën, leveranciers, capaciteit en projecten en de organisatie strategisch adviseert.",
+    results: [
+      "Vastgestelde digitale meerjarenstrategie",
+      "Toekomstbestendig formatieplan",
+      "Integraal projectportfolio",
+      "Actuele architectuur",
+      "Professionele leveranciersregie",
+      "Duidelijke rollen en verantwoordelijkheden",
+      "Betrouwbare managementinformatie",
+    ],
+    topics: [
+      "Digitale strategie en meerjarenvisie",
+      "Formatie en organisatorische inrichting",
+      "Financiële sturing en budgetbeheer",
+      "Portfoliomanagement",
+      "Projectmanagement en projectmethodiek",
+      "Leveranciers- en contractmanagement",
+      "Enterprise architectuur",
+      "Governance en eigenaarschap",
+      "Informatiemanagement en vraagsturing",
+      "Teamontwikkeling en opleidingen",
+      "Regionale samenwerking",
+      "Managementrapportages",
+      "Inkoop- en toetsingsproces voor digitale oplossingen",
+    ],
+  },
+  {
+    number: 2,
+    title: "Informatiebeveiliging, privacy en continuïteit",
+    shortTitle: "Security, privacy & continuïteit",
+    objective:
+      "Een digitaal weerbare gemeente die zorgvuldig omgaat met informatie en persoonsgegevens, risico's beheerst en haar kritische dienstverlening kan voortzetten of herstellen.",
+    results: [
+      "Aantoonbare beheersing van beveiligingsrisico's",
+      "Actueel beveiligingsprogramma",
+      "Inzicht in kritische gemeentelijke processen",
+      "Geteste continuïteits- en herstelplannen",
+      "Professionele privacyprocessen",
+      "Bestuurlijk bewustzijn",
+      "Duidelijk onderscheid tussen onafhankelijk toezicht, advisering en operationele uitvoering",
+    ],
+    topics: [
+      "BIO2",
+      "NIS2 en Cyberbeveiligingswet",
+      "ENSIA",
+      "Information Security Management System (ISMS)",
+      "Data Security Microsoft 365",
+      "Security awareness en Guardey",
+      "Bestuurlijke bewustwording",
+      "Securitymonitoring",
+      "Vulnerabilitymanagement",
+      "Incidentrespons",
+      "Bedrijfscontinuïteit en Business Impact Analysis",
+      "Disaster recovery en back-ups",
+      "Leverancierssecurity",
+      "Privacy governance, AVG en Wpg",
+      "DPIA's",
+      "Privacyprocessen",
+      "Privacy & security by design",
+      "Autorisatiebeleid",
+    ],
+  },
+  {
+    number: 3,
+    title: "Betrouwbare digitale basis",
+    shortTitle: "Digitale basis",
+    objective:
+      "Een stabiele, betrouwbare, beheerbare en toekomstbestendige IT-omgeving die medewerkers optimaal ondersteunt.",
+    results: [
+      "Actueel inzicht in systemen en afhankelijkheden",
+      "Professionele IT-beheerprocessen",
+      "Minder incidenten",
+      "Minder handmatige werkzaamheden",
+      "Duidelijk eigenaarschap van applicaties",
+      "Minder afhankelijkheid van individuele medewerkers en leveranciers",
+    ],
+    topics: [
+      "Assetmanagement",
+      "Configuratiemanagement en CMDB",
+      "Applicatieportfolio",
+      "Incidentmanagement",
+      "Problemmanagement",
+      "Changemanagement",
+      "Servicedesk en ticketmanagement",
+      "Netwerkinfrastructuur",
+      "ICT-ruimten",
+      "Certificaatbeheer",
+      "Licentiebeheer",
+      "Identity & Access Management",
+      "Provisioning en HelloID",
+      "Digitale werkplek en Microsoft 365",
+      "Professionalisering functioneel beheer",
+      "Kennisborging en achtervang",
+      "Lifecyclemanagement",
+      "Technische monitoring",
+      "Applicatierationalisatie",
+    ],
+  },
+  {
+    number: 4,
+    title: "Datagedreven werken en AI",
+    shortTitle: "Data & AI",
+    objective:
+      "Een gemeente die data en kunstmatige intelligentie verantwoord inzet voor betere besluitvorming, dienstverlening, bedrijfsvoering en vermindering van administratieve werkdruk.",
+    results: [
+      "Betrouwbare gemeentelijke stuurinformatie",
+      "Organisatiebreed gedragen datavisie",
+      "Duidelijk data-eigenaarschap",
+      "Veilige inzet van AI",
+      "Aantoonbare resultaten vanuit AI-pilots",
+      "Toekomstbestendige interne expertise",
+    ],
+    topics: [
+      "Datavisie",
+      "Data governance",
+      "Dataplatform en architectuur",
+      "Datakwaliteit",
+      "Data-eigenaarschap",
+      "Datacatalogus",
+      "Business intelligence en dashboards",
+      "Datagedreven besluitvorming",
+      "Self-service analytics",
+      "Datavaardigheid",
+      "AI-visie en strategie",
+      "AI-beleid",
+      "AI-governance en AI-verordening",
+      "Generatieve AI",
+      "AI-pilots",
+      "AI en procesautomatisering",
+      "AI-geletterdheid",
+      "AI-register",
+      "AI binnen data-analyse",
+      "Continuïteit en kennisborging datateam",
+    ],
+  },
+  {
+    number: 5,
+    title: "Toekomstbestendig informatiebeheer",
+    shortTitle: "Informatiebeheer",
+    objective:
+      "Gemeentelijke informatie is gedurende de volledige levenscyclus betrouwbaar, toegankelijk, vindbaar, duurzaam beschikbaar en rechtmatig beheerd.",
+    results: [
+      "Actueel informatiebeheerplan",
+      "Inzicht in gemeentelijke informatie",
+      "Betere vindbaarheid van documenten",
+      "Betrouwbare digitale archivering",
+      "Beheersing van bewaartermijnen",
+      "Minder kwetsbaarheid binnen DIV",
+      "Professionele digitale informatiehuishouding",
+    ],
+    topics: [
+      "Informatiebeheerplan",
+      "Archiefwet",
+      "Digitale archivering",
+      "E-depot",
+      "Fysieke archieven",
+      "Overdracht vergunningen aan het RHC",
+      "Vernietiging en bewaartermijnen",
+      "Archivering en retentie Microsoft 365",
+      "Zaakgericht werken",
+      "Toekomst JOIN",
+      "Kwaliteitscontrole dossiers",
+      "Digitaal samenwerken",
+      "Informatiehuishouding en Woo",
+      "Informatievaardigheden",
+      "Continuïteit DIV",
+    ],
+  },
+  {
+    number: 6,
+    title: "Digitale dienstverlening en procesoptimalisatie",
+    shortTitle: "Dienstverlening & processen",
+    objective:
+      "Het verbeteren van dienstverlening aan inwoners, ondernemers en medewerkers door processen te vereenvoudigen, standaardiseren, digitaliseren en automatiseren.",
+    results: [
+      "Betere dienstverlening",
+      "Minder administratieve werkzaamheden",
+      "Minder dubbele gegevensinvoer",
+      "Betere samenwerking met vakafdelingen",
+      "Meetbare tijdwinst en kwaliteitsverbetering",
+      "Duidelijke proceseigenaren",
+    ],
+    topics: [
+      "Digitale dienstverlening",
+      "Procesmanagement",
+      "Procesoptimalisatie",
+      "Digitale formulieren",
+      "Formulieren automatisch koppelen aan JOIN",
+      "Digitale Wmo-beschikkingen",
+      "Digitale Jeugdbeschikkingen",
+      "Integraties sociaal domein",
+      "Digitaal klantportaal",
+      "Common Ground",
+      "Digitale toegankelijkheid",
+      "Migratie OpenOnline naar PodiumD",
+      "SelfGuide",
+      "Privacyverzoeken via DigiD",
+      "Digitale adoptie",
+      "Meten van efficiency",
+      "Workflowautomatisering",
+    ],
+  },
+  {
+    number: 7,
+    title: "GEO en geo-informatie",
+    shortTitle: "GEO",
+    objective:
+      "Een betrouwbare en toekomstbestendige geo-informatievoorziening die wettelijke registratietaken borgt, ruimtelijke opgaven ondersteunt en bijdraagt aan datagedreven besluitvorming en dienstverlening.",
+    results: [
+      "Betrouwbare wettelijke basisregistraties",
+      "Efficiënte ketensamenwerking",
+      "Beheersbare werkvoorraad",
+      "Minder handmatige werkzaamheden",
+      "Brede beschikbaarheid van geo-informatie",
+      "Doorontwikkeling van Digital Twin op basis van concrete gebruikersbehoeften",
+    ],
+    topics: [
+      "GEO-strategie en roadmap",
+      "BAG",
+      "BGT",
+      "BRO",
+      "Kwaliteit basisregistraties",
+      "Samenwerkingsportaal BAG en BSGR",
+      "Ketensamenwerking met onder andere BSGR en ODMH",
+      "Integrale objectregistratie en Mercator",
+      "Databeheer BOR",
+      "Digital Twin",
+      "Geo-analyses",
+      "GEO en inwonersparticipatie",
+      "Omgevingswet en DSO",
+      "Regel- en planbeheer",
+      "Tekenwerkzaamheden",
+      "NLCS",
+      "GEO-applicatielandschap",
+      "GEO-dataontsluiting",
+      "AI binnen GEO",
+      "Capaciteit en kennisborging",
+    ],
+  },
+];
+
+export const DISCIPLINES: { code: string; name: string }[] = [
+  { code: "MGT", name: "Management en regie" },
+  { code: "IA", name: "Informatieadvies" },
+  { code: "ARCH", name: "Architectuur" },
+  { code: "ICT", name: "ICT-regie" },
+  { code: "FB", name: "Functioneel beheer" },
+  { code: "SEC", name: "Security" },
+  { code: "PRIV", name: "Privacy" },
+  { code: "DATA", name: "Data & AI" },
+  { code: "DIV", name: "DIV" },
+  { code: "GEO", name: "GEO" },
+  { code: "PM", name: "Projectmanagement" },
+  { code: "PROC", name: "Procesoptimalisatie" },
+];
+
+export const ROLES = [
+  { code: "admin", name: "Administrator", description: "Technisch en functioneel beheer, gebruikers, configuratie en autorisaties." },
+  { code: "teamleider", name: "Teamleider", description: "Integraal inzicht, prioriteiten vaststellen, jaarplan, capaciteit, besluiten en rapportages." },
+  { code: "medewerker", name: "Medewerker", description: "Onderwerpen aanvullen, deepdives, prioriteiten beoordelen, opmerkingen." },
+  { code: "projectleider", name: "Projectleider", description: "Eigen projecten beheren: planning, voortgang, risico's, acties en kosten." },
+  { code: "management", name: "Management / Directie", description: "Inzage in strategische dashboards, portfolio, risico's en capaciteit; besluitvorming." },
+] as const;
+
+/** Uitsluitend fictieve gebruikers voor de ontwikkelomgeving. */
+export const DEV_USERS = [
+  { email: "beheerder@voorbeeld.test", name: "Alex Beheer (fictief)", discipline: "ICT", roles: ["admin"] },
+  { email: "teamleider@voorbeeld.test", name: "Robin Teamleider (fictief)", discipline: "MGT", roles: ["teamleider"] },
+  { email: "medewerker.security@voorbeeld.test", name: "Sam Security (fictief)", discipline: "SEC", roles: ["medewerker"] },
+  { email: "medewerker.data@voorbeeld.test", name: "Dani Data (fictief)", discipline: "DATA", roles: ["medewerker"] },
+  { email: "medewerker.geo@voorbeeld.test", name: "Jip Geo (fictief)", discipline: "GEO", roles: ["medewerker"] },
+  { email: "medewerker.div@voorbeeld.test", name: "Noa Informatiebeheer (fictief)", discipline: "DIV", roles: ["medewerker"] },
+  { email: "projectleider@voorbeeld.test", name: "Kim Projectleider (fictief)", discipline: "PM", roles: ["projectleider", "medewerker"] },
+  { email: "directie@voorbeeld.test", name: "Lou Directie (fictief)", discipline: null, roles: ["management"] },
+] as const;
+
+/** Standaard gewogen prioriteringsmodel met per criterium een specifieke rubric (score 0..5). */
+export const PRIORITY_CRITERIA = [
+  {
+    code: "WET",
+    name: "Wet- en regelgeving",
+    weight: 20,
+    description: "Mate waarin het initiatief noodzakelijk is om aan wet- en regelgeving of normenkaders te voldoen.",
+    rubric: [
+      "Geen relatie met wet- of regelgeving.",
+      "Indirecte relatie; draagt beperkt bij aan naleving.",
+      "Ondersteunt naleving, maar zonder concrete verplichting.",
+      "Concrete verplichting zonder harde termijn of sanctie.",
+      "Wettelijke verplichting met termijn binnen 2 jaar.",
+      "Wettelijke verplichting met harde deadline binnen 12 maanden of lopende non-compliance.",
+    ],
+  },
+  {
+    code: "RISICO",
+    name: "Risico en continuïteit",
+    weight: 25,
+    description: "Mate waarin het initiatief een risico voor informatieveiligheid, privacy of continuïteit van dienstverlening beheerst.",
+    rubric: [
+      "Geen aantoonbaar risico bij niet uitvoeren.",
+      "Beperkt risico; hinder voor enkele medewerkers.",
+      "Merkbaar risico voor een afdeling of een niet-kritisch proces.",
+      "Substantieel risico voor meerdere processen of gevoelige gegevens.",
+      "Hoog risico voor kritische dienstverlening of grootschalig datalek.",
+      "Acuut risico: uitval van kritische processen of incident is reëel en nabij.",
+    ],
+  },
+  {
+    code: "STRAT",
+    name: "Strategische bijdrage",
+    weight: 20,
+    description: "Bijdrage aan het centrale thema 'van reactief beheer naar proactieve regie' en de strategische pijlers.",
+    rubric: [
+      "Geen bijdrage aan strategische doelen.",
+      "Zeer beperkte, indirecte bijdrage.",
+      "Bijdrage aan één doelstelling binnen één pijler.",
+      "Duidelijke bijdrage aan meerdere doelstellingen.",
+      "Sleutelinitiatief voor een pijler.",
+      "Fundamenteel voor de strategie; meerdere pijlers zijn ervan afhankelijk.",
+    ],
+  },
+  {
+    code: "DIENST",
+    name: "Dienstverlening",
+    weight: 15,
+    description: "Effect op dienstverlening aan inwoners, ondernemers en medewerkers.",
+    rubric: [
+      "Geen effect op dienstverlening.",
+      "Klein effect voor een beperkte groep medewerkers.",
+      "Merkbare verbetering voor een interne doelgroep.",
+      "Merkbare verbetering voor inwoners of ondernemers in één domein.",
+      "Grote verbetering voor meerdere domeinen of doelgroepen.",
+      "Grote verbetering voor alle inwoners/ondernemers of herstel van een ernstig knelpunt.",
+    ],
+  },
+  {
+    code: "EFF",
+    name: "Efficiency",
+    weight: 10,
+    description: "Besparing van tijd, handmatig werk of kosten.",
+    rubric: [
+      "Geen besparing of zelfs extra werk.",
+      "Marginale besparing (< 40 uur per jaar).",
+      "Beperkte besparing (40–200 uur per jaar).",
+      "Merkbare besparing (200–500 uur per jaar) of minder dubbele invoer.",
+      "Grote besparing (500–1.000 uur per jaar).",
+      "Zeer grote besparing (> 1.000 uur per jaar) of structureel minder werkdruk in meerdere teams.",
+    ],
+  },
+  {
+    code: "RAND",
+    name: "Randvoorwaardelijkheid",
+    weight: 10,
+    description: "Mate waarin andere initiatieven afhankelijk zijn van dit initiatief.",
+    rubric: [
+      "Geen andere initiatieven afhankelijk.",
+      "Eén initiatief heeft er beperkt baat bij.",
+      "Eén initiatief is er gedeeltelijk afhankelijk van.",
+      "Meerdere initiatieven zijn er gedeeltelijk afhankelijk van.",
+      "Meerdere initiatieven kunnen zonder dit niet starten.",
+      "Fundament: een groot deel van het portfolio is ervan afhankelijk.",
+    ],
+  },
+];
+
+/** Configureerbare rekenaannames (alle waarden aanpasbaar in Beheer > Instellingen). */
+export const DEFAULT_SETTINGS: Record<string, { value: unknown; description: string }> = {
+  "capaciteit.aannames": {
+    value: {
+      uren_per_fte_per_jaar: 1872,
+      vakantie_en_verlof_pct: 10.5,
+      feestdagen_uren_per_fte: 57.6,
+      verwachte_afwezigheid_pct: 4.5,
+      overleg_pct: 8,
+      opleiding_pct: 3,
+      incidenten_onvoorzien_pct: 10,
+      managementtaken_pct: 0,
+    },
+    description:
+      "Aannames voor netto inzetbare capaciteit. Percentages worden berekend over contracturen; feestdagen in uren per FTE. Pas aan op basis van eigen HR-gegevens.",
+  },
+  "risico.matrix": {
+    value: { laag_tot: 4, midden_tot: 9, hoog_tot: 16, labels: ["Laag", "Midden", "Hoog", "Zeer hoog"] },
+    description: "Drempels 5×5-risicomatrix (kans × impact). Score ≤ laag_tot = Laag, enz.",
+  },
+  "haalbaarheid.drempel": { value: 50, description: "Grens tussen hoge en lage haalbaarheid in de matrix (0–100)." },
+  "prioriteit.drempel_matrix": { value: 60, description: "Grens tussen hoge en lage prioriteit in de matrix (0–100)." },
+  "jaarplan.actief_jaar": { value: 2027, description: "Jaar dat standaard wordt getoond in jaarplan en dashboard." },
+  "roadmap.periode": { value: { van: 2027, tot: 2030 }, description: "Periode van de meerjarenroadmap." },
+  "organisatie.naam": { value: "Gemeente Bodegraven-Reeuwijk", description: "Naam van de organisatie." },
+  "organisatie.thema": {
+    value: "Van reactief beheer naar proactieve regie – een betrouwbare digitale basis voor een toekomstbestendige gemeente.",
+    description: "Centraal thema van het actieve jaar.",
+  },
+};
+
+export const EXAMPLE_KPIS = [
+  { name: "Percentage applicaties met vastgesteld eigenaarschap", unit: "%", pillar: 3, direction: "Hoger is beter" },
+  { name: "Percentage kritische applicaties met achtervang", unit: "%", pillar: 3, direction: "Hoger is beter" },
+  { name: "Aantal verlopen certificaten", unit: "aantal", pillar: 3, direction: "Lager is beter" },
+  { name: "Percentage geteste herstelplannen", unit: "%", pillar: 2, direction: "Hoger is beter" },
+  { name: "Percentage afgeronde beveiligingsmaatregelen", unit: "%", pillar: 2, direction: "Hoger is beter" },
+  { name: "Aantal openstaande DPIA's", unit: "aantal", pillar: 2, direction: "Lager is beter" },
+  { name: "Beschikbaarheid kritische systemen", unit: "%", pillar: 3, direction: "Hoger is beter" },
+  { name: "Gerealiseerde tijdwinst vanuit automatisering", unit: "uur", pillar: 6, direction: "Hoger is beter" },
+  { name: "Datakwaliteit", unit: "%", pillar: 4, direction: "Hoger is beter" },
+  { name: "Kwaliteit van basisregistraties", unit: "%", pillar: 7, direction: "Hoger is beter" },
+  { name: "Percentage projecten op schema", unit: "%", pillar: 1, direction: "Hoger is beter" },
+] as const;
+
+/** Voorbeeld-structurele werkzaamheden zonder urenschatting (onbekend tot ingevuld). */
+export const EXAMPLE_RECURRING = [
+  { name: "Functioneel beheer", pillar: 3, discipline: "FB" },
+  { name: "Incidentafhandeling", pillar: 3, discipline: "ICT" },
+  { name: "Applicatiebeheer", pillar: 3, discipline: "FB" },
+  { name: "Securitymonitoring", pillar: 2, discipline: "SEC", legal: false },
+  { name: "Privacywerkzaamheden", pillar: 2, discipline: "PRIV", legal: true },
+  { name: "ENSIA-verantwoording", pillar: 2, discipline: "SEC", legal: true },
+  { name: "BAG-beheer", pillar: 7, discipline: "GEO", legal: true },
+  { name: "BGT-beheer", pillar: 7, discipline: "GEO", legal: true },
+  { name: "Archiefbeheer", pillar: 5, discipline: "DIV", legal: true },
+  { name: "Dataonderhoud", pillar: 4, discipline: "DATA" },
+  { name: "Leveranciersmanagement", pillar: 1, discipline: "ICT" },
+  { name: "Periodieke controles", pillar: 2, discipline: "SEC" },
+  { name: "Onderhoudswerkzaamheden", pillar: 3, discipline: "ICT" },
+];
+
+export const EXAMPLE_SCENARIOS = [
+  { name: "Huidige organisatie", description: "Vastgestelde formatie en feitelijke bezetting.", baseline: true },
+  { name: "Minimale noodzakelijke bezetting", description: "Bezetting die nodig is om wettelijke taken en continuïteit te borgen." },
+  { name: "Gewenste organisatie", description: "Organisatie om de ambities van het jaarplan te realiseren." },
+  { name: "Ambitieuze toekomstorganisatie", description: "Organisatie voor de volledige meerjarenambitie." },
+];

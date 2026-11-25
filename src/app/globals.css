@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Design tokens – Digitale Informatie | Strategie & Portfolio
+   LET OP: officiële huisstijlwaarden van de gemeente konden niet worden
+   vastgesteld (website niet bereikbaar vanuit de ontwikkelomgeving).
+   Onderstaande waarden zijn neutrale AANNAMES; vervang ze in dit blok
+   (of via src/config/brand.ts voor teksten/logo). Zie DESIGN_SYSTEM.md.
+   ===================================================================== */
+:root {
+  /* Merk */
+  --brand-primary: #164a5e;        /* aanname: donker petrol */
+  --brand-primary-hover: #0f3746;
+  --brand-primary-soft: #e6eff2;
+  --brand-secondary: #4a5f66;      /* aanname: leisteen */
+  --brand-accent: #b4532a;         /* aanname: terracotta, spaarzaam gebruiken */
+  --brand-accent-soft: #f7ebe4;
+
+  /* Neutraal */
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --surface-muted: #f1f3f4;
+  --sidebar-bg: #102f3b;
+  --sidebar-fg: #d9e4e8;
+  --sidebar-muted: #8fa9b2;
+  --text: #182226;
+  --text-muted: #55636a;           /* ≥ 4.5:1 op wit */
+  --text-subtle: #6b787e;
+  --border: #dde2e5;
+  --border-strong: #c3cbcf;
+
+  /* Status (tekstkleuren voldoen aan AA op lichte achtergrond) */
+  --status-green: #22704a;
+  --status-green-bg: #e7f3ec;
+  --status-amber: #8a5a0b;
+  --status-amber-bg: #fbf1dc;
+  --status-red: #a52a1f;
+  --status-red-bg: #fbe9e7;
+  --status-blue: #1f5c99;
+  --status-blue-bg: #e7eff8;
+  --status-gray: #55636a;
+  --status-gray-bg: #eef0f1;
+
+  /* Prioriteit */
+  --p1: #0f3746;
+  --p2: #3b7385;
+  --p3: #79a6b3;
+  --p4: #bdd5dc;
+
+  /* Grafiekreeksen (gevalideerd op CVD-scheiding en contrast) */
+  --chart-1: #0f74a0;
+  --chart-2: #c0672f;
+  --chart-grid: #e6eaec;
+
+  /* Volwassenheid 1..5 */
+  --m1: #c9d6db;
+  --m2: #9db5be;
+  --m3: #6c929f;
+  --m4: #3e6f80;
+  --m5: #164a5e;
+
+  /* Typografie */
+  --font-sans: "Segoe UI", "Source Sans 3", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
+
+  /* Vorm */
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-card: 0 1px 2px rgb(16 47 59 / 0.06), 0 1px 1px rgb(16 47 59 / 0.04);
+  --focus-ring: #1f5c99;
+}
+
+@theme inline {
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-soft: var(--brand-primary-soft);
+  --color-secondary: var(--brand-secondary);
+  --color-accent: var(--brand-accent);
+  --color-accent-soft: var(--brand-accent-soft);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ok: var(--status-green);
+  --color-ok-bg: var(--status-green-bg);
+  --color-warn: var(--status-amber);
+  --color-warn-bg: var(--status-amber-bg);
+  --color-bad: var(--status-red);
+  --color-bad-bg: var(--status-red-bg);
+  --color-info: var(--status-blue);
+  --color-info-bg: var(--status-blue-bg);
+  --color-neutral: var(--status-gray);
+  --color-neutral-bg: var(--status-gray-bg);
+  --color-p1: var(--p1);
+  --color-p2: var(--p2);
+  --color-p3: var(--p3);
+  --color-p4: var(--p4);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --shadow-card: var(--shadow-card);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  font-feature-settings: "tnum" 0;
+}
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Zichtbare focus voor toetsenbordgebruikers (WCAG 2.4.7 / 2.4.13) */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.sidebar :focus-visible {
+  outline-color: #ffffff;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+}
+.skip-link:focus {
+  left: 8px;
+}
+
+dialog::backdrop {
+  background: rgb(16 34 38 / 0.45);
+}
+
+/* Presentatiemodus: grotere typografie, geen chrome */
+.presentation {
+  font-size: 18px;
+}
+.presentation h1 {
+  font-size: 2.25rem;
+}
+
+@media print {
+  .no-print, .sidebar, header[data-topbar] {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    font-size: 11pt;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .print-break {
+    break-before: page;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
