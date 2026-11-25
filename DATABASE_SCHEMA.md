@@ -71,6 +71,14 @@ Overige tabellen: `budgets`, `suppliers`, `regulatory_requirements`, `comments`,
 documentopslag), `saved_views` (opgeslagen filterweergaven), `work_sessions` (werksessie hervatten), `settings`,
 `audit_logs`, `priority_assessment_revisions`, `schema_migrations`.
 
+## Uitbreidingen 0007–0008 (vereenvoudigde opzet)
+
+- `topics.owner_name`, `kpis.owner_name`, `projects.lead_name`: naam van een teamlid of een vaste keuze
+  (*Geen persoon beschikbaar*, *Geen capaciteit (nog niet toe te wijzen)*; zie `src/lib/domain.ts`). Leeg = nog niet bepaald.
+- `team_members` (naam uniek, functie, soort Vast/Inhuur, actief): keuzelijst voor eigenaar/trekker. RLS en audit zoals overige tabellen.
+- `pillars.ambition_q1..q4`: ambitie 2027 per kwartaal.
+- `projects.planner_task_id` (uniek indien gevuld), `planner_url`, `description`.
+
 ## Belangrijke constraints
 
 | Constraint | Doel |

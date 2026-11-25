@@ -1,6 +1,6 @@
 /**
  * Werkomgeving zonder login: standaard werk je als "Team Digitale Informatie"
- * (alle rechten). Alleen bij prioriteringssessies kies je wie er beoordeelt.
+ * (alle rechten). (Een andere demogebruiker kiezen kan alleen voor tests.)
  */
 import { dbFor, demoUsers, type Db, type DemoUser } from "@/lib/db";
 import { can, type Permission } from "./permissions";
@@ -41,7 +41,7 @@ export async function loadCurrentUser(): Promise<CurrentUser> {
   return current;
 }
 
-/** Tijdelijk (dit tabblad) als een andere deelnemer werken, bv. om te beoordelen in een prioriteringssessie. */
+/** Tijdelijk (dit tabblad) als een andere deelnemer werken, bv. voor tests. */
 export function setDemoUser(email: string | null) {
   try { if (email) sessionStorage.setItem(KEY, email); else sessionStorage.removeItem(KEY); } catch {}
 }
@@ -55,7 +55,7 @@ export async function requireUser(): Promise<CurrentUser> {
 }
 
 export class AuthorizationError extends Error {
-  constructor(message = "Hiervoor zijn geen rechten. Werk je als deelnemer in een prioriteringssessie? Ga terug naar Team Digitale Informatie.") {
+  constructor(message = "Hiervoor zijn geen rechten. Ga terug naar Team Digitale Informatie.") {
     super(message);
   }
 }

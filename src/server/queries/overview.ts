@@ -1,35 +1,42 @@
 import type { Db } from "@/lib/db";
+import { OWNER_NO_CAPACITY, OWNER_NO_PERSON } from "@/lib/domain";
 
 export const ACTIVE_PROJECT = ["Gepland", "Goedgekeurd", "In voorbereiding", "In uitvoering", "Geblokkeerd"];
 
 export type PillarSummary = {
   id: string; number: number; title: string; short_title: string | null; objective: string;
-  topics: number; topics_with_owner: number; topics_described: number; kpis: number; projects_running: number; projects_total: number; last_update: string | null;
+  ambition_year: string | null; ambition_q1: string | null; ambition_q2: string | null; ambition_q3: string | null; ambition_q4: string | null;
+  topics: number; topics_with_owner: number; topics_no_capacity: number; topics_no_person: number; topics_described: number;
+  kpis: number; projects_running: number; projects_total: number; last_update: string | null;
 };
 
-/** Overzicht per pijler: onderwerpen, eigenaarschap, KPI's en gekoppelde projecten/initiatieven. */
+/** Overzicht per pijler: onderwerpen, eigenaarschap, KPI's, projecten/initiatieven en ambities per kwartaal. */
 export async function pillarSummaries(db: Db) {
   return db.query<PillarSummary>(
     `with pj as (
        select j.id, j.status, j.primary_pillar_id as pillar_id from projects j where j.archived_at is null
        union select j.id, j.status, pp.pillar_id from projects j join project_pillars pp on pp.project_id = j.id where j.archived_at is null
-       union select j.id, j.status, t.pillar_id from projects j join project_topics pt on pt.project_id = j.id join topics t on t.id = pt.topic_id where j.archived_at is null)
-     select p.id, p.number, p.title, p.short_title, p.objective,
-       (select count(*) from topics t where t.pillar_id = p.id and t.archived_at is null and t.status not in ('Samengevoegd','Gesplitst'))::int as topics,
-       (select count(*) from topics t where t.pillar_id = p.id and t.archived_at is null and t.status not in ('Samengevoegd','Gesplitst') and coalesce(t.owner_name,'') <> '')::int as topics_with_owner,
-       (select count(*) from topics t where t.pillar_id = p.id and t.archived_at is null and t.status not in ('Samengevoegd','Gesplitst')
-          and (coalesce(t.description,'') <> '' or coalesce(t.scope,'') <> ''))::int as topics_described,
+       union select j.id, j.status, t.pillar_id from projects j join project_topics pt on pt.project_id = j.id join topics t on t.id = pt.topic_id where j.archived_at is null),
+     tp as (select t.* from topics t where t.archived_at is null and t.status not in ('Samengevoegd','Gesplitst'))
+     select p.id, p.number, p.title, p.short_title, p.objective, p.ambition_year, p.ambition_q1, p.ambition_q2, p.ambition_q3, p.ambition_q4,
+       (select count(*) from tp where tp.pillar_id = p.id)::int as topics,
+       (select count(*) from tp where tp.pillar_id = p.id and coalesce(tp.owner_name,'') <> '' and tp.owner_name not in ($1, $2))::int as topics_with_owner,
+       (select count(*) from tp where tp.pillar_id = p.id and tp.owner_name = $2)::int as topics_no_capacity,
+       (select count(*) from tp where tp.pillar_id = p.id and tp.owner_name = $1)::int as topics_no_person,
+       (select count(*) from tp where tp.pillar_id = p.id and (coalesce(tp.description,'') <> '' or coalesce(tp.scope,'') <> ''))::int as topics_described,
        (select count(*) from kpis k left join topics t on t.id = k.topic_id where k.archived_at is null and (k.pillar_id = p.id or t.pillar_id = p.id))::int as kpis,
        (select count(distinct id) from pj where pj.pillar_id = p.id and pj.status = 'In uitvoering')::int as projects_running,
        (select count(distinct id) from pj where pj.pillar_id = p.id and pj.status not in ('Afgerond','Geannuleerd'))::int as projects_total,
        greatest(p.updated_at, (select max(updated_at) from topics t where t.pillar_id = p.id)) as last_update
-     from pillars p where p.archived_at is null order by p.number`);
+     from pillars p where p.archived_at is null order by p.number`, [OWNER_NO_PERSON, OWNER_NO_CAPACITY]);
 }
 
 export async function pillarDetail(db: Db, number: number) {
   const p = await db.one<{ id: string; number: number; title: string; short_title: string | null; description: string | null; objective: string;
-    ambition_year: string | null; ambition_multi_year: string | null; updated_at: string }>(
-    `select id, number, title, short_title, description, objective, ambition_year, ambition_multi_year, updated_at from pillars where number = $1`, [number]);
+    ambition_year: string | null; ambition_multi_year: string | null; updated_at: string;
+    ambition_q1: string | null; ambition_q2: string | null; ambition_q3: string | null; ambition_q4: string | null }>(
+    `select id, number, title, short_title, description, objective, ambition_year, ambition_multi_year, updated_at,
+            ambition_q1, ambition_q2, ambition_q3, ambition_q4 from pillars where number = $1`, [number]);
   if (!p) return null;
   const [results, topics, kpis, projects] = await Promise.all([
     db.query<{ text: string }>(`select text from pillar_objectives where pillar_id = $1 and kind = 'gewenst_resultaat' order by sort_order`, [p.id]),

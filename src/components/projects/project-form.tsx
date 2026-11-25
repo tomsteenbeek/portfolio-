@@ -5,6 +5,7 @@ import { Checkbox, Field, Input, Select, Textarea, inputClass } from "@/componen
 import { saveProject, SIMPLE_PROJECT_STATUSES } from "@/server/actions/projects";
 import type { Lookups } from "@/server/queries/topics";
 import type { ProjectRow } from "@/server/queries/projects";
+import { OwnerSelect } from "@/components/team/owner-select";
 
 /** Project/initiatief: het werk zelf staat in Planner; hier de koppeling aan pijlers en onderwerpen. */
 export function ProjectForm({ p, lookups, defaultTopic }: { p?: ProjectRow | null; lookups: Lookups; defaultTopic?: string }) {
@@ -26,7 +27,7 @@ export function ProjectForm({ p, lookups, defaultTopic }: { p?: ProjectRow | nul
             <Field label="Link naar Planner" htmlFor="pj-url" hint="Kopieer de link van het Planner-bord of de taak" error={fieldError(state, "planner_url")} className="md:col-span-2">
               <Input id="pj-url" name="planner_url" type="url" placeholder="https://tasks.office.com/…" defaultValue={v("planner_url")} />
             </Field>
-            <Field label="Trekker" htmlFor="pj-lead" hint="Naam, functie of team"><Input id="pj-lead" name="lead_name" maxLength={120} defaultValue={v("lead_name")} /></Field>
+            <Field label="Trekker" htmlFor="pj-lead"><OwnerSelect id="pj-lead" name="lead_name" team={lookups.team} defaultValue={v("lead_name")} /></Field>
             <Field label="Status" htmlFor="pj-status" required><Select id="pj-status" name="status" defaultValue={v("status") || "Gepland"} options={statuses} /></Field>
             <Field label="Startdatum" htmlFor="pj-start" hint="Nodig om op de roadmap te verschijnen"><Input id="pj-start" name="start_date" type="date" defaultValue={v("start_date")} /></Field>
             <Field label="Einddatum" htmlFor="pj-end" error={fieldError(state, "end_date")}><Input id="pj-end" name="end_date" type="date" defaultValue={v("end_date")} /></Field>

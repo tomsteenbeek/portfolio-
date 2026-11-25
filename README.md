@@ -1,6 +1,6 @@
 # Digitale Informatie | Strategie & Portfolio
 
-Dashboard voor strategie, jaarplan, gezamenlijke prioritering, portfolio-, project- en capaciteitsmanagement van team
+Dashboard voor strategie, eigenaarschap, projecten/initiatieven, jaarplan en roadmap van team
 Digitale Informatie (gemeente Bodegraven-Reeuwijk).
 
 > Centraal thema 2027: **Van reactief beheer naar proactieve regie – een betrouwbare digitale basis voor een toekomstbestendige gemeente.**
@@ -14,11 +14,10 @@ Digitale Informatie (gemeente Bodegraven-Reeuwijk).
 | **Supabase** | PostgreSQL-database; de browser leest en schrijft via twee beveiligde databasefuncties |
 
 **Wat erin zit:** de 7 strategische pijlers met per pijler de onderwerpen (werk in uitvoering, met één eigenaar),
-KPI's, en projecten/initiatieven die in Planner worden bijgehouden maar hier aan pijlers en onderwerpen worden gekoppeld.
-Daarnaast Prioritering (gezamenlijk scoren in werksessies), Jaarplan en Roadmap.
+ambities 2027 per kwartaal, KPI's, en projecten/initiatieven die op het I&A-bord in Planner worden bijgehouden maar hier
+aan pijlers en onderwerpen worden gekoppeld. Daarnaast Team (eigenaren/trekkers en hun belasting), Jaarplan en Roadmap.
 
-Er is **geen login en geen rollen**: iedereen werkt als *Team Digitale Informatie*. Alleen in een prioriteringssessie
-kies je bij *Beoordelen als* welke deelnemer aan de beurt is.
+Er is **geen login en geen rollen**: iedereen werkt als *Team Digitale Informatie*.
 
 > ⚠️ **Alleen voor demo en eigen gebruik met fictieve of niet-gevoelige gegevens.** Zonder login kan iedereen met de
 > link gegevens bekijken en wijzigen. Zie [SECURITY.md](SECURITY.md). De volledige serverversie (met Entra ID-voorbereiding,
@@ -57,14 +56,23 @@ demogebruikers. Bij volgende publicaties wordt de database alleen bijgewerkt; jo
 ## Dagelijks gebruik
 - Open de link: het dashboard toont de pijlers; klik door naar een pijler, onderwerp, KPI of project en pas aan.
   Alles wordt direct opgeslagen in Supabase.
-- **Eigenaar** van een onderwerp: klik in *Onderwerpen* op de eigenaar, of selecteer meerdere onderwerpen → *Eigenaar instellen*.
-- **Projecten & initiatieven**: plak de link van het Planner-bord; koppel pijlers en onderwerpen.
-- **Prioritering**: voeg op het tabblad *Deelnemers* namen toe; in een sessie kies je *Beoordelen als*.
+- **Team**: voeg teamleden (vast of inhuur) toe onder *Team*. Zij verschijnen als keuze bij eigenaar en trekker.
+- **Eigenaar** van een onderwerp: klik in *Onderwerpen* op de eigenaar, of selecteer meerdere onderwerpen en kies een eigenaar.
+  Naast teamleden kun je kiezen voor *Geen persoon beschikbaar* of *Geen capaciteit (nog niet toe te wijzen)*.
+- **Ambities 2027 per kwartaal**: open een pijler → *Pijler bewerken* → Q1 t/m Q4. Het dashboard toont ze als matrix.
+- **Projecten & initiatieven**: plak de link naar Planner; koppel pijlers en onderwerpen.
 - **Exports** (Excel, CSV, JSON, Print/PDF) worden in je browser gemaakt.
 - **Back-up**: Supabase maakt dagelijks back-ups (gratis plan: beperkte bewaartijd). Extra zekerheid: exports, of
   `pg_dump` met de connection string.
 - **Gratis Supabase pauzeert** na een week zonder gebruik. Het dashboard meldt dan dat de database niet bereikbaar is;
   zet het project in Supabase weer aan (*Restore project*). Je gegevens blijven bewaard.
+
+## Teamleden en projecten uit het I&A-bord laden
+Namen staan bewust **niet** in deze (openbare) repository. Ze worden eenmalig in Supabase gezet met een SQL-script
+(*SQL Editor → New query → plakken → Run*). Het script is herhaalbaar: teamleden worden op naam en projecten op
+Planner-taak-id bijgewerkt in plaats van dubbel aangemaakt. Teamleden kun je daarna ook in het scherm *Team* beheren.
+
+> Let op: wat in de database staat is zonder login zichtbaar voor iedereen met de link van de site.
 
 ## Lokaal ontwikkelen
 Vereisten: Node.js 22 en PostgreSQL (lokaal of Supabase).

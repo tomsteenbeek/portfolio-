@@ -1,4 +1,5 @@
 "use client";
+import { OwnerLabel } from "@/components/team/owner-select";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ExternalLink } from "lucide-react";
@@ -38,9 +39,11 @@ export function ProjectList({ rows, pillars }: { rows: ProjectRow[]; pillars: { 
             <tr key={r.id} className="border-t border-line align-top">
               <td className="px-3 py-2"><Link href={`/projecten/detail?id=${r.id}`} className="font-medium hover:text-primary hover:underline">{r.name}</Link>
                 {r.description && <p className="line-clamp-1 text-[12px] text-muted">{r.description}</p>}</td>
-              <td className="px-3 py-2 whitespace-nowrap">{[r.pillar_number, ...r.secondary_pillars].join(", ")}</td>
+              <td className="px-3 py-2 whitespace-nowrap">{[r.pillar_number, ...r.secondary_pillars].map((n, i) => (
+                <span key={n} title={`Pijler ${n}${i === 0 ? " (hoofdpijler)" : ""}`} className={cn("num mr-1 inline-flex h-5 min-w-5 items-center justify-center rounded px-1 text-[11px] font-semibold", i === 0 ? "text-white" : "border bg-surface")}
+                  style={i === 0 ? { background: `var(--pillar-${n})` } : { borderColor: `var(--pillar-${n})`, color: "var(--text)" }}>{n}</span>))}</td>
               <td className="px-3 py-2">{r.topics.length ? r.topics.map((t) => <Link key={t.id} href={`/onderwerpen/detail?id=${t.id}`} title={t.title} className="mr-1.5 num text-primary hover:underline">{t.code}</Link>) : <span className="text-subtle">–</span>}</td>
-              <td className="px-3 py-2">{r.lead_name ?? <span className="text-subtle">–</span>}</td>
+              <td className="px-3 py-2"><OwnerLabel name={r.lead_name} empty="–" /></td>
               <td className="px-3 py-2"><StatusBadge status={r.status} /></td>
               <td className="num px-3 py-2 whitespace-nowrap">{fmtDate(r.end_date)}</td>
               <td className="px-3 py-2">{r.planner_url ? <a href={r.planner_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">Openen<ExternalLink className="h-3.5 w-3.5" aria-hidden /></a> : <span className="text-subtle">–</span>}</td>

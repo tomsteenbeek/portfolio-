@@ -1,3 +1,4 @@
+import { teamOptions } from "@/server/queries/team";
 import type { Db } from "@/lib/db";
 
 export type TopicRow = {
@@ -21,13 +22,14 @@ export async function listTopics(db: Db, opts: { includeArchived?: boolean; pill
 }
 
 export async function lookups(db: Db) {
-  const [pillars, topics] = await Promise.all([
+  const [pillars, topics, team] = await Promise.all([
     db.query<{ id: string; number: number; title: string; short_title: string }>(`select id, number, title, short_title from pillars where archived_at is null order by number`),
     db.query<{ id: string; code: string; title: string; pillar_id: string; pillar_number: number }>(
       `select t.id, t.code, t.title, t.pillar_id, p.number as pillar_number from topics t join pillars p on p.id = t.pillar_id
         where t.archived_at is null and t.status not in ('Samengevoegd','Gesplitst') order by p.number, string_to_array(t.code,'.')::int[]`),
+    teamOptions(db),
   ]);
-  return { pillars, topics };
+  return { pillars, topics, team };
 }
 export type Lookups = Awaited<ReturnType<typeof lookups>>;
 

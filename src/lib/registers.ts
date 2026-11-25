@@ -12,7 +12,7 @@ export type RefKind = "pillars" | "users" | "disciplines" | "projects" | "progra
 export type FieldDef = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "number" | "date" | "select" | "bool" | "ref" | "url" | "score";
+  type: "text" | "textarea" | "number" | "date" | "select" | "bool" | "ref" | "url" | "score" | "owner";
   options?: readonly string[];
   ref?: RefKind;
   required?: boolean;
@@ -104,7 +104,7 @@ export const REGISTERS: Record<string, RegisterDef> = {
       { name: "name", label: "KPI-naam", type: "text", required: true, list: true, wide: true },
       { name: "pillar_id", label: "Pijler", type: "ref", ref: "pillars", list: true },
       { name: "topic_id", label: "Onderwerp", type: "ref", ref: "topics", list: true, hint: "Optioneel: koppel de KPI aan een specifiek onderwerp." },
-      { name: "owner_name", label: "Eigenaar", type: "text", list: true },
+      { name: "owner_name", label: "Eigenaar", type: "owner", list: true },
       { name: "unit", label: "Eenheid", type: "text", list: true },
       { name: "direction", label: "Richting", type: "select", options: ["Hoger is beter", "Lager is beter"], required: true },
       { name: "description", label: "Omschrijving", type: "textarea", wide: true },

@@ -11,6 +11,7 @@ import { inputClass } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/components/ui/cn";
 import { refreshData } from "@/lib/refresh";
+import { OwnerLabel, OwnerSelect } from "@/components/team/owner-select";
 
 type SortKey = "code" | "title" | "owner_name" | "kpi_count" | "project_count";
 const PAGE = 60;
@@ -26,6 +27,7 @@ export function TopicTable({ rows, lookups, initialPillar, initialQ }: { rows: T
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  const [bulkOwner, setBulkOwner] = useState("");
   const owners = useMemo(() => [...new Set(rows.map((r) => r.owner_name).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, "nl")), [rows]);
 
   const shown = useMemo(() => {
@@ -74,7 +76,7 @@ export function TopicTable({ rows, lookups, initialPillar, initialQ }: { rows: T
         </label>
         <label className="flex flex-col gap-0.5 text-[12px] text-muted">Eigenaar
           <select className={cn(inputClass, "h-8 py-0 text-[13px]")} value={owner} onChange={(e) => { setOwner(e.target.value); setPage(0); }}>
-            <option value="">Alle</option><option value="-">Nog geen eigenaar</option>{owners.map((o) => <option key={o}>{o}</option>)}
+            <option value="">Alle</option><option value="-">Nog niet bepaald</option>{owners.map((o) => <option key={o}>{o}</option>)}
           </select>
         </label>
         {(q || pillar || owner) && <Button size="sm" variant="ghost" onClick={() => { setQ(""); setPillar(""); setOwner(""); }}><X className="h-3.5 w-3.5" aria-hidden />Wis filters</Button>}
@@ -87,7 +89,10 @@ export function TopicTable({ rows, lookups, initialPillar, initialQ }: { rows: T
       {selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-b border-line bg-primary-soft px-3 py-2 text-[13px]" role="region" aria-label="Bulkacties">
           <strong>{selected.size} geselecteerd</strong>
-          <Button size="sm" onClick={() => { const v = prompt("Eigenaar voor de geselecteerde onderwerpen (leeg = verwijderen)"); if (v !== null) bulk("owner", v); }}>Eigenaar instellen</Button>
+          <label className="inline-flex items-center gap-1.5"><span className="text-muted">Eigenaar</span>
+            <OwnerSelect team={lookups.team} value={bulkOwner} onChange={(e) => setBulkOwner(e.target.value)} className="h-8 w-64 py-0 text-[13px]" emptyLabel="(eigenaar verwijderen)" />
+          </label>
+          <Button size="sm" onClick={() => bulk("owner", bulkOwner)}>Toepassen</Button>
           <Button size="sm" variant="danger" onClick={() => confirm(`${selected.size} onderwerp(en) archiveren?`) && bulk("archive")}><Archive className="h-4 w-4" aria-hidden />Archiveren</Button>
           <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>Selectie opheffen</Button>
         </div>
@@ -115,9 +120,10 @@ export function TopicTable({ rows, lookups, initialPillar, initialQ }: { rows: T
                   <div className="text-[12px] text-muted">Pijler {r.pillar_number}</div></td>
                 <td className="px-3 py-2">
                   {editing === r.id ? (
-                    <input autoFocus aria-label={`Eigenaar van ${r.code}`} defaultValue={r.owner_name ?? ""} className={cn(inputClass, "h-8 text-[13px]")}
-                      onKeyDown={(e) => { if (e.key === "Escape") setEditing(null); if (e.key === "Enter") e.currentTarget.blur(); }}
-                      onBlur={async (e) => {
+                    <OwnerSelect autoFocus aria-label={`Eigenaar van ${r.code}`} team={lookups.team} defaultValue={r.owner_name} className="h-8 text-[13px]"
+                      onKeyDown={(e) => { if (e.key === "Escape") setEditing(null); }}
+                      onBlur={() => setEditing(null)}
+                      onChange={async (e) => {
                         const v = e.currentTarget.value; setEditing(null);
                         if (v === (r.owner_name ?? "")) return;
                         const res = await inlineUpdateTopic(r.id, "owner_name", v);
@@ -125,7 +131,7 @@ export function TopicTable({ rows, lookups, initialPillar, initialQ }: { rows: T
                       }} />
                   ) : (
                     <button type="button" onClick={() => setEditing(r.id)} className="group inline-flex items-center gap-1 text-left" aria-label={`Eigenaar van ${r.code} bewerken`}>
-                      {r.owner_name ?? <span className="text-subtle">Nog geen eigenaar</span>}
+                      <OwnerLabel name={r.owner_name} />
                       <Pencil className="h-3.5 w-3.5 text-subtle opacity-0 group-hover:opacity-100 group-focus:opacity-100" aria-hidden />
                     </button>
                   )}

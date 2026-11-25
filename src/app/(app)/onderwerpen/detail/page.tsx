@@ -1,4 +1,5 @@
 "use client";
+import { OwnerLabel } from "@/components/team/owner-select";
 import Link from "next/link";
 import { z } from "zod";
 import { ExternalLink, Plus } from "lucide-react";
@@ -38,7 +39,7 @@ export default function TopicPage() {
       <>
         <PageHeader title={<><span className="num font-normal text-muted">{t.code}</span> {t.title}</>}
           crumbs={[{ label: "Onderwerpen", href: "/onderwerpen" }, { label: `Pijler ${t.pillar_number}`, href: `/pijlers/detail?nr=${t.pillar_number}` }, { label: t.code }]}
-          meta={<span className="text-[13px] text-muted">Eigenaar: <strong className="text-ink">{t.owner_name ?? "nog niet bepaald"}</strong> · bijgewerkt {fmtDateTime(t.updated_at)}</span>}
+          meta={<span className="text-[13px] text-muted">Eigenaar: <strong className="text-ink"><OwnerLabel name={t.owner_name} /></strong> · bijgewerkt {fmtDateTime(t.updated_at)}</span>}
           actions={<LinkButton href={`${base}&tab=bewerken`} variant="primary">Aanvullen / bewerken</LinkButton>} />
         <TabLinks base={base} active={tab} tabs={[{ key: "overzicht", label: "Overzicht" }, { key: "bewerken", label: "Bewerken" },
           { key: "opmerkingen", label: "Opmerkingen", count: d.comments.length }, { key: "historie", label: "Historie" }]} />

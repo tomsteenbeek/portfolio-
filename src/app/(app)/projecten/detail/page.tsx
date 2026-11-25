@@ -1,4 +1,5 @@
 "use client";
+import { OwnerLabel } from "@/components/team/owner-select";
 import Link from "next/link";
 import { z } from "zod";
 import { ExternalLink } from "lucide-react";
@@ -33,7 +34,7 @@ export default function ProjectPage() {
               <DescriptionList cols={1} items={[
                 { label: "Hoofdpijler", value: <Link className="text-primary hover:underline" href={`/pijlers/detail?nr=${p.pillar_number}`}>{p.pillar_number}. {p.pillar_title}</Link> },
                 { label: "Draagt ook bij aan", value: p.secondary_pillars.length ? p.secondary_pillars.map((n) => `Pijler ${n}`).join(", ") : <Text value={null} empty="–" /> },
-                { label: "Trekker", value: <Text value={p.lead_name} empty="Nog niet bepaald" /> },
+                { label: "Trekker", value: <OwnerLabel name={p.lead_name} /> },
                 { label: "Periode", value: `${fmtDate(p.start_date, "?")} – ${fmtDate(p.end_date, "?")}` },
               ]} />
             </CardBody></Card>

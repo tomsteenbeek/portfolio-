@@ -3,6 +3,7 @@ import { ActionForm, SubmitButton, fieldError } from "@/components/ui/action-for
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { saveTopic } from "@/server/actions/topics";
 import type { Lookups } from "@/server/queries/topics";
+import { OwnerSelect } from "@/components/team/owner-select";
 
 type T = { id?: string; title?: string; pillar_id?: string; owner_name?: string | null; description?: string | null; scope?: string | null; intended_result?: string | null; remarks?: string | null };
 
@@ -14,7 +15,7 @@ export function TopicForm({ topic, lookups, defaultPillar }: { topic?: T; lookup
       {(state) => (
         <>
           {topic?.id && <input type="hidden" name="id" value={topic.id} />}
-          <div className="grid gap-4 md:grid-cols-[1fr_280px_240px]">
+          <div className="grid gap-4 md:grid-cols-[1fr_260px_280px]">
             <Field label="Titel" htmlFor="title" required error={fieldError(state, "title")}>
               <Input id="title" name="title" required minLength={2} maxLength={300} defaultValue={v("title")} />
             </Field>
@@ -22,8 +23,8 @@ export function TopicForm({ topic, lookups, defaultPillar }: { topic?: T; lookup
               <Select id="pillar_id" name="pillar_id" required defaultValue={v("pillar_id") || defaultPillar || ""} placeholder="Kies een pijler"
                 options={lookups.pillars.map((p) => ({ value: p.id, label: `${p.number}. ${p.short_title ?? p.title}` }))} />
             </Field>
-            <Field label="Eigenaar" htmlFor="owner_name" hint="Naam, functie of team" error={fieldError(state, "owner_name")}>
-              <Input id="owner_name" name="owner_name" maxLength={120} defaultValue={v("owner_name")} />
+            <Field label="Eigenaar" htmlFor="owner_name" hint="Teamlid, of geef aan dat er (nog) niemand beschikbaar is" error={fieldError(state, "owner_name")}>
+              <OwnerSelect id="owner_name" name="owner_name" team={lookups.team} defaultValue={v("owner_name")} />
             </Field>
           </div>
           <Field label="Omschrijving" htmlFor="description" hint="Waar gaat dit onderwerp over?">

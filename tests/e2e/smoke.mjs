@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 
 const BASE = (process.env.BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 const PATHS = ["/", "/pijlers/detail/?nr=1", "/pijlers/detail/?nr=4", "/onderwerpen/", "/onderwerpen/nieuw/", "/kpis/", "/projecten/",
-  "/prioritering/", "/prioritering/?tab=deelnemers", "/prioritering/?tab=model", "/prioritering/?tab=matrix", "/jaarplan/", "/roadmap/", "/zoeken/?q=data"];
+  "/team/", "/jaarplan/", "/roadmap/", "/zoeken/?q=data"];
 // Geen rollen meer: standaard "Team Digitale Informatie"; daarnaast één deelnemer (zoals bij beoordelen in een sessie).
 const ROLES = ["team@voorbeeld.test", "medewerker.data@voorbeeld.test"];
 

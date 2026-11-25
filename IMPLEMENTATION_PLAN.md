@@ -13,6 +13,16 @@ KPI's (koppelbaar aan pijler en onderwerp), projecten/initiatieven (link naar Pl
 Prioritering, Jaarplan en Roadmap. Geen rollen. Overige modules (deepdive, besluiten, risico's, formatie, capaciteit,
 kanban, beheer, import) staan nog op de branch `server-versie`; de databasetabellen bestaan nog.
 
+## Aanpassingen (november 2026, tweede ronde)
+
+- Prioritering verwijderd uit `main` (tabellen blijven bestaan; code staat op `server-versie`).
+- Teamleden (`team_members`, migratie 0008) als keuzelijst voor eigenaar (onderwerp, KPI) en trekker (project), met de
+  vaste keuzes *Geen persoon beschikbaar* en *Geen capaciteit (nog niet toe te wijzen)*. Namen worden niet in de seed
+  opgenomen maar via een SQL-script in Supabase of het scherm Team.
+- Ambities 2027 per kwartaal (`pillars.ambition_q1..q4`).
+- Projecten uit het I&A-bord (Planner) met `planner_task_id`, zodat een herhaalde import bijwerkt.
+- Visueler dashboard: pijlerkleuren, eigenaarschap per pijler, teambelasting, kwartaalmatrix, status en einddatums.
+
 ## Fasering en status (oorspronkelijk)
 
 ### Fase 1 – Fundament ✅

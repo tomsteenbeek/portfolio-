@@ -1,5 +1,6 @@
 import type { Db } from "@/lib/db";
 import type { RefKind, RegisterDef } from "@/lib/registers";
+import { teamOptions, type TeamOption } from "@/server/queries/team";
 
 const REF_LABEL: Record<RefKind, (col: string) => string> = {
   pillars: (c) => `(select 'Pijler ' || number || ' – ' || coalesce(short_title, title) from pillars where id = r.${c})`,
@@ -21,12 +22,13 @@ const REF_OPTIONS: Record<RefKind, string> = {
   scenarios: `select id, name as label from staffing_scenarios order by name`,
 };
 
-export type RefOptions = Partial<Record<RefKind, { id: string; label: string }[]>>;
+export type RefOptions = Partial<Record<RefKind, { id: string; label: string }[]>> & { team?: TeamOption[] };
 
 export async function refOptions(db: Db, def: RegisterDef): Promise<RefOptions> {
   const kinds = [...new Set(def.fields.filter((f) => f.ref).map((f) => f.ref!))];
   const out: RefOptions = {};
   for (const k of kinds) out[k] = await db.query(REF_OPTIONS[k]);
+  if (def.fields.some((f) => f.type === "owner")) out.team = await teamOptions(db);
   return out;
 }
 

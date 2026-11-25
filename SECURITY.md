@@ -42,3 +42,8 @@ hostingadvies (Azure Container Apps + Azure Database for PostgreSQL in West Euro
 - Alleen fictieve demogebruikers (`@voorbeeld.test`).
 - Formatieposities kunnen zonder persoonskoppeling worden vastgelegd.
 - Importbestanden met medewerkersinput: verwijder namen van respondenten zolang deze demo-omgeving wordt gebruikt.
+
+## Namen van teamleden
+
+Teamleden (naam en functie) staan alleen in de Supabase-database, niet in de repository. Zonder login zijn ze zichtbaar
+voor iedereen met de link van de site. Neem nooit salaris-, budget- of HR-gegevens uit de formatie-overzichten op.

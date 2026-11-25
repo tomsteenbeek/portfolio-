@@ -13,6 +13,8 @@ import { PillarForm } from "@/components/pillar-form";
 import { PrintButton } from "@/components/common/print-button";
 import { fmtDate, fmtNumber } from "@/lib/format";
 import { ExternalLink, Plus } from "lucide-react";
+import { OwnerLabel } from "@/components/team/owner-select";
+import { OWNER_SPECIAL, QUARTERS } from "@/lib/domain";
 
 export default function PillarPage() {
   return <AsyncPage render={async (sp) => {
@@ -21,20 +23,35 @@ export default function PillarPage() {
     const d = await db((x) => pillarDetail(x, nr));
     if (!d) notFound();
     const { p } = d;
-    const owned = d.topics.filter((t) => t.owner_name).length;
+    const owned = d.topics.filter((t) => t.owner_name && !(OWNER_SPECIAL as readonly string[]).includes(t.owner_name)).length;
     return (
       <>
         <PageHeader title={<><span className="font-normal text-muted">Pijler {p.number} · </span>{p.title}</>} description={p.objective}
           crumbs={[{ label: "Dashboard", href: "/" }, { label: `Pijler ${p.number}` }]}
           actions={<><PrintButton /><Dialog trigger="Pijler bewerken" title={`Pijler ${p.number} bewerken`} wide><PillarForm p={p} results={d.results.map((r) => r.text)} /></Dialog></>} />
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="mb-4 h-1.5 rounded-full" style={{ background: `var(--pillar-${p.number})` }} aria-hidden />
+        <div className="grid gap-4 lg:grid-cols-2">
           <Card><CardHeader title="Gewenste resultaten" /><CardBody>
             <ul className="list-disc space-y-1 pl-5 text-sm">{d.results.map((r, i) => <li key={i}>{r.text}</li>)}</ul>
           </CardBody></Card>
-          <Card><CardHeader title="Ambitie 2027" /><CardBody className="text-sm whitespace-pre-wrap"><Text value={p.ambition_year} /></CardBody></Card>
           <Card><CardHeader title="Meerjarenambitie" /><CardBody className="text-sm whitespace-pre-wrap"><Text value={p.ambition_multi_year} />{p.description && <p className="mt-3 text-muted">{p.description}</p>}</CardBody></Card>
         </div>
+
+        <Card className="mt-4">
+          <CardHeader title="Ambitie 2027" description={p.ambition_year ?? "Samenvatting nog niet ingevuld"} />
+          <ol className="grid gap-3 px-5 pb-5 sm:grid-cols-2 xl:grid-cols-4">
+            {QUARTERS.map((q, i) => {
+              const v = p[`ambition_${q}`];
+              return (
+                <li key={q} className={`relative rounded-lg border p-4 pt-5 ${v ? "border-line bg-surface-muted/60" : "border-dashed border-line"}`}>
+                  <span className="absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white" style={{ background: `var(--pillar-${p.number})` }}>Q{i + 1} 2027</span>
+                  {v ? <p className="text-sm whitespace-pre-wrap">{v}</p> : <p className="text-[13px] text-subtle">Nog in te vullen via Pijler bewerken</p>}
+                </li>
+              );
+            })}
+          </ol>
+        </Card>
 
         <Card className="mt-4">
           <CardHeader title={`Onderwerpen (${d.topics.length})`} description={`${owned} met eigenaar · onderwerpen worden gaandeweg aangescherpt en aangevuld`}
@@ -49,7 +66,7 @@ export default function PillarPage() {
                   <td className="num px-4 py-2 text-muted">{t.code}</td>
                   <td className="px-4 py-2"><Link href={`/onderwerpen/detail?id=${t.id}`} className="font-medium hover:text-primary hover:underline">{t.title}</Link>
                     {t.description && <p className="line-clamp-2 text-[12px] text-muted">{t.description}</p>}</td>
-                  <td className="px-4 py-2">{t.owner_name ?? <span className="text-subtle">–</span>}</td>
+                  <td className="px-4 py-2"><OwnerLabel name={t.owner_name} empty="–" /></td>
                   <td className="px-4 py-2 text-muted"><span className="line-clamp-2">{t.scope ?? <span className="text-subtle">Nog aan te vullen</span>}</span></td>
                   <td className="num px-4 py-2">{t.kpi_count || <span className="text-subtle">–</span>}</td>
                   <td className="num px-4 py-2">{t.project_count || <span className="text-subtle">–</span>}</td>
@@ -77,7 +94,7 @@ export default function PillarPage() {
                 <li key={j.id} className="flex items-start justify-between gap-3 px-5 py-2.5">
                   <div className="min-w-0">
                     <Link href={`/projecten/detail?id=${j.id}`} className="font-medium hover:text-primary hover:underline">{j.name}</Link>
-                    <div className="text-[12px] text-muted">{j.lead_name ?? "Geen trekker"}{j.end_date ? ` · t/m ${fmtDate(j.end_date)}` : ""}{j.topics.length ? ` · ${j.topics.join(", ")}` : ""}</div>
+                    <div className="text-[12px] text-muted"><OwnerLabel name={j.lead_name} empty="Geen trekker" />{j.end_date ? ` · t/m ${fmtDate(j.end_date)}` : ""}{j.topics.length ? ` · ${j.topics.join(", ")}` : ""}</div>
                   </div>
                   <span className="flex shrink-0 items-center gap-2">
                     {j.planner_url && <a href={j.planner_url} target="_blank" rel="noopener noreferrer" className="text-primary" aria-label={`${j.name} openen in Planner`}><ExternalLink className="h-4 w-4" /></a>}

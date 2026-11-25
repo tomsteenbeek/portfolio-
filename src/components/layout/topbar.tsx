@@ -16,7 +16,7 @@ export function Topbar({ user }: { user: CurrentUser }) {
       {asParticipant && (
         <div className="ml-auto flex items-center gap-2 rounded-md bg-warn-bg px-3 py-1.5 text-[13px] text-warn">
           <UserRound className="h-4 w-4" aria-hidden />
-          Je beoordeelt als <strong>{user.displayName.replace(" (fictief)", "")}</strong>
+          Je werkt als <strong>{user.displayName.replace(" (fictief)", "")}</strong>
           <button type="button" className="ml-1 inline-flex items-center gap-1 underline" onClick={() => { setDemoUser(null); window.location.reload(); }}>
             <X className="h-3.5 w-3.5" aria-hidden />Stoppen
           </button>

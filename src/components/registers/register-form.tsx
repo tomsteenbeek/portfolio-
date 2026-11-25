@@ -5,6 +5,7 @@ import { saveRecord } from "@/server/actions/registers";
 import type { RegisterDef } from "@/lib/registers";
 import type { RefOptions } from "@/server/queries/registers";
 import { cn } from "@/components/ui/cn";
+import { OwnerSelect } from "@/components/team/owner-select";
 
 export function RegisterForm({ def, record, refs, disabled, defaults }: {
   def: RegisterDef; record?: Record<string, unknown> | null; refs: RefOptions; disabled?: boolean; defaults?: Record<string, string>;
@@ -33,6 +34,7 @@ export function RegisterForm({ def, record, refs, disabled, defaults }: {
                     {f.type === "textarea" ? <Textarea {...common} defaultValue={val(f.name)} rows={3} />
                       : f.type === "select" ? <Select {...common} options={f.options ?? []} placeholder={f.required ? undefined : "—"} defaultValue={val(f.name)} required={f.required} />
                       : f.type === "ref" ? <Select {...common} options={(refs[f.ref!] ?? []).map((o) => ({ value: o.id, label: o.label }))} placeholder={f.required ? "Kies…" : "—"} defaultValue={val(f.name)} required={f.required} />
+                      : f.type === "owner" ? <OwnerSelect {...common} team={refs.team ?? []} defaultValue={val(f.name)} />
                       : f.type === "score" ? <Select {...common} options={["1", "2", "3", "4", "5"]} placeholder="Nog niet beoordeeld" defaultValue={val(f.name)} />
                       : <Input {...common} type={f.type === "number" ? "number" : f.type === "date" ? "date" : f.type === "url" ? "url" : "text"} step={f.type === "number" ? "any" : undefined}
                           min={f.min} max={f.max} defaultValue={val(f.name)} required={f.required} />}

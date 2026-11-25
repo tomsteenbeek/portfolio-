@@ -60,3 +60,10 @@ export const DEEPDIVE_QUESTIONS = [
   { key: "q14", label: "Welke vakafdelingen moeten betrokken worden?" },
   { key: "q15", label: "Wie is eigenaar?" },
 ] as const;
+
+/** Eigenaar van een onderwerp/KPI of trekker van een project: een teamlid of één van deze vaste keuzes. */
+export const OWNER_NO_PERSON = "Geen persoon beschikbaar";
+export const OWNER_NO_CAPACITY = "Geen capaciteit (nog niet toe te wijzen)";
+export const OWNER_SPECIAL = [OWNER_NO_PERSON, OWNER_NO_CAPACITY] as const;
+export const TEAM_KINDS = ["Vast", "Inhuur"] as const;
+export const QUARTERS = ["q1", "q2", "q3", "q4"] as const;

@@ -62,6 +62,21 @@
   --chart-2: #2f8a55;
   --chart-grid: #e4e9ef;
 
+  /* Pijlerkleuren (accent: rand, stip, balk; het label staat er altijd bij) */
+  --pillar-1: #2a6fb0;
+  --pillar-2: #c0442f;
+  --pillar-3: #3aa0d4;
+  --pillar-4: #7a55b0;
+  --pillar-5: #b07d16;
+  --pillar-6: #2f9a5c;
+  --pillar-7: #c2509a;
+
+  /* Eigenaarschap */
+  --own-person: #2f6aa3;
+  --own-capacity: #d9a23a;
+  --own-none: #c0533f;
+  --own-open: #d5dde6;
+
   /* Volwassenheid 1..5 */
   --m1: #cfdeee;
   --m2: #9dbcdc;
